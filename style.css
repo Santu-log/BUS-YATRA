@@ -1,0 +1,365 @@
+
+header {
+    background-color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    
+}
+
+.nav-menu {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .nav-menu {
+        display: flex;
+        gap: 1.5rem; 
+    }
+}
+ 
+
+.home-link {
+    color: #047857; 
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.home-link:hover {
+    color: #065f46; 
+}
+
+.menu-link {
+    color: #4B5563;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.menu-link:hover {
+    color: #065f46; /* text-green-900 */
+}
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* space-x-4 equivalent */
+}
+
+.language-selector {
+    position: relative;
+}
+
+.language-button {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #374151; /* text-gray-700 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.chevron-icon {
+    font-size: 0.75rem; /* text-xs equivalent */
+}
+
+.language-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 0.25rem;
+    margin-top: 0.25rem;
+    min-width: 100px;
+    z-index: 100;
+}
+
+.language-dropdown a {
+    display: block;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #000000;
+}
+
+.language-dropdown a:hover {
+    background-color: #f3f4f6; /* hover:bg-gray-100 */
+}
+
+.language-selector:hover .language-dropdown {
+    display: block;
+}
+
+.sign-in-button {
+    background-color: #059669; 
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.sign-in-button:hover {
+    background-color: #047857; 
+}
+
+
+.hero-section {
+    background: linear-gradient(to right, #22c55e, #2c1580); 
+    color: white;
+    padding: 4rem 1rem;
+    text-align: center;
+}
+
+.hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.hero-title {
+    font-size: 2.25rem; 
+    font-weight: bold;
+    margin-bottom: 1rem;
+    margin-top: 0%;
+/*     
+    text-decoration:underline; */
+    display: flex;
+    justify-content: center;
+   
+}
+
+.logo{
+    mix-blend-mode: darken;
+}
+
+@media (min-width: 768px) {
+    .hero-title {
+        font-size: 3rem; /* md:text-5xl */
+    }
+}
+
+.hero-description {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    max-width: 40rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .hero-form {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+
+.phone-input {
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    color: #1f2937; /* text-gray-800 */
+    width: 100%;
+    max-width: 16rem;
+    border: none;
+    font-size: 1rem;
+}
+
+.get-started-button {
+    background-color: #ffffff;
+    color: #047857; /* text-green-700 */
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+}
+
+
+.dashboard-container {
+    margin-bottom: 2rem;
+}
+
+.dashboard-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.user-card {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.welcome-text {
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.login-time {
+    color: #4b5563;
+}
+
+.status-badges {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+}
+
+.badge.active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge.premium {
+    background: #dbeafe;
+    color: #1e3a8a;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.card {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    padding: 1rem;
+    font-weight: bold;
+    font-size: 1.125rem;
+}
+        
+.card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+ }
+        
+.card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+        
+.location{
+    display: flex;
+}
+.location input{
+     width: 100%;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.crop-header {
+    background:blue;
+}
+
+.weather-header {
+    background: #2563eb;
+}
+
+.market-header {
+    background: #7c3aed;
+}
+
+.image{
+    border-radius: 20%;
+    border: 2px solid black;
+    margin-left: 40px;
+    margin-top:20px;
+    height: 300px;
+    width: 400px;
+    background-size: cover;
+    background-image: url("75\ bus\ image.jpeg");
+}
+.no2{
+ background-image: url("ac12\ busimages.jpeg");
+}
+.no3{
+    background-image: url("sbstc\ bus\ images.jpeg");
+}
+.no4{
+    background-image: url("nbs.webp");
+}
+.no5{
+    background-image: url("tourist\ bus.jpeg");
+}
+.card-body {
+    padding: 1rem;
+}
+
+.card-body label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.card-body select {
+    width: 0%;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    
+}
+
+.recommend-btn {
+    width: 100%;
+    background: #059669;
+    color: white;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.recommend-btn:hover {
+    background: #047857;
+}
+
+
+
