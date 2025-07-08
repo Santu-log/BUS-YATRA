@@ -10,4 +10,3 @@ const allSelects = document.querySelectorAll(".selectLocation");
       input.value = this.value;
     });
   });
-
