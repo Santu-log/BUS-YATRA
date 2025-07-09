@@ -128,6 +128,11 @@ header {
     text-decoration:underline; */
     display: flex;
     justify-content: center;
+
+    /* background-image: url("Bus\ logo.webp");
+    background-size: contain; 
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;  */
    
 }
 

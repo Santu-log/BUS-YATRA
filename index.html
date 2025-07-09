@@ -24,9 +24,8 @@
     
     <a href="#home" class="menu-link">Home</a>
     <a href="#dashboard" class="home-link">Dashboard</a>
-    <div><a href="#price" class="menu-link"><i class="fa-solid fa-location-dot">
-        
-    </i> Fetch Current location</a>
+    <div>
+<a href="#" class="menu-link" id="location-link"><i class="fa-solid fa-location-dot"></i> Fetch Current location</a>
     
 </div>
     
@@ -47,7 +46,7 @@
     </div>
     
     <button class="sign-in-button">
-        Sign In
+       <a href="sing_in.html">Sign In</a> 
     </button>
 </div>
 
@@ -100,7 +99,72 @@
         </div>
     </div>
 
-    <div class="dashboard-grid">
+
+<div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: flex-start;">
+        <!-- First Container -->
+        <div style="background: #e8e8e8; border-radius: 20px; padding: 30px; max-width: 400px; width: 100%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px; text-align: left;">Search Route by Source and Destination</h2>
+            
+            <div style="position: relative; margin-bottom: 20px;">
+                <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; font-size: 18px;"><i class="fa-solid fa-location-dot"></i></div>
+                <input type="text" placeholder="From Location" style="width: 100%; padding: 18px 60px 18px 50px; border: 2px solid #999; border-radius: 15px; font-size: 16px; background: white; color: #333; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#2c4a5a'; this.style.boxShadow='0 0 0 3px rgba(44, 74, 90, 0.1)'" onblur="this.style.borderColor='#999'; this.style.boxShadow='none'">
+                <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;"><i class="fa-solid fa-microphone"></i></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0;">
+                <div style="font-size: 24px; color: #4a5568; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;" onmouseover="this.style.transform='rotate(180deg)'" onmouseout="this.style.transform='rotate(0deg)'">⇅</div>
+                <div style="color: #333; font-size: 16px; font-weight: 500; cursor: pointer; text-align: right; transition: color 0.2s;" onmouseover="this.style.color='#2c4a5a'" onmouseout="this.style.color='#333'">Add Stop</div>
+            </div>
+            
+            <div style="position: relative; margin-bottom: 20px;">
+                <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; font-size: 18px;"><i class="fa-solid fa-location-dot"></i></div>
+                <input type="text" placeholder="To Location" style="width: 100%; padding: 18px 60px 18px 50px; border: 2px solid #999; border-radius: 15px; font-size: 16px; background: white; color: #333; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#2c4a5a'; this.style.boxShadow='0 0 0 3px rgba(44, 74, 90, 0.1)'" onblur="this.style.borderColor='#999'; this.style.boxShadow='none'">
+                <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;"><i class="fa-solid fa-microphone"></i></div>
+            </div>
+            
+            <button style="width: 100%; background: #2c4a5a; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s;" onmouseover="this.style.background='#1e3a4a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2c4a5a'; this.style.transform='translateY(0)'" onmousedown="this.style.transform='translateY(0)'" onmouseup="this.style.transform='translateY(-2px)'">Search Route</button>
+        </div>
+        
+        <!-- Second Container -->
+        <div style="background: #e8e8e8; border-radius: 20px; padding: 30px; max-width: 400px; width: 100%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px; text-align: left;">Search a Bus Route</h2>
+            
+            
+            
+            
+            
+            <div style="position: relative; margin-bottom: 20px;">
+                <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; font-size: 18px;"><i class="fa-solid fa-location-dot"></i></div>
+                <input type="text" placeholder="Bus Name/No" style="width: 100%; padding: 18px 60px 18px 50px; border: 2px solid #999; border-radius: 15px; font-size: 16px; background: white; color: #333; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#2c4a5a'; this.style.boxShadow='0 0 0 3px rgba(44, 74, 90, 0.1)'" onblur="this.style.borderColor='#999'; this.style.boxShadow='none'">
+                <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;"><i class="fa-solid fa-microphone"></i></div>
+            </div>
+            
+            <button style="width: 100%; background: #2c4a5a; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s;" onmouseover="this.style.background='#1e3a4a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2c4a5a'; this.style.transform='translateY(0)'" onmousedown="this.style.transform='translateY(0)'" onmouseup="this.style.transform='translateY(-2px)'">Search Bus Route</button>
+        </div>
+        
+        <!-- Third Container -->
+        <div style="background: #e8e8e8; border-radius: 20px; padding: 30px; max-width: 400px; width: 100%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px; text-align: left;">Search BUS Route for a location</h2>
+            
+            <div style="position: relative; margin-bottom: 20px;">
+                <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; font-size: 18px;"><i class="fa-solid fa-location-dot"></i></div>
+                <input type="text" placeholder=" Location" style="width: 100%; padding: 18px 60px 18px 50px; border: 2px solid #999; border-radius: 15px; font-size: 16px; background: white; color: #333; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#2c4a5a'; this.style.boxShadow='0 0 0 3px rgba(44, 74, 90, 0.1)'" onblur="this.style.borderColor='#999'; this.style.boxShadow='none'">
+                <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;"><i class="fa-solid fa-microphone"></i></div>
+            </div>
+            
+            
+            
+            
+            
+            <button style="width: 100%; background: #2c4a5a; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s;" onmouseover="this.style.background='#1e3a4a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2c4a5a'; this.style.transform='translateY(0)'" onmousedown="this.style.transform='translateY(0)'" onmouseup="this.style.transform='translateY(-2px)'">Search Bus Route</button>
+        </div>
+    </div>
+
+    
+    
+
+    
+    <div class="dashboard-grid" style="margin-top: 20px;">
 
         <div class="card">
             <div class="card-header crop-header">
