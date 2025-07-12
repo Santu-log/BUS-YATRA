@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Routing Map</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet & Routing Machine -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+
+  <!-- Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; font-family: Arial; }
+    #map { height: 100%; }
+
+    .search-box {
+      position: absolute;
+      top: 20px;
+      left: 20%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      z-index: 1000;
+      width: 330px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 5px 10px;
+      position: relative;
+    }
+
+    .input-group input {
+      border: none;
+      outline: none;
+      flex: 1;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .autocomplete {
+      background: #fff;
+      border: 1px solid #ccc;
+      max-height: 150px;
+      overflow-y: auto;
+      position: absolute;
+      top: 38px;
+      left: 35px;
+      right: 10px;
+      z-index: 2000;
+      border-radius: 0 0 6px 6px;
+    }
+
+    .autocomplete div {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .autocomplete div:hover {
+      background-color: #f0f0f0;
+    }
+
+    .swap-icon {
+      text-align: center;
+      margin: 5px auto;
+      cursor: pointer;
+    }
+
+    .search-button {
+      text-align: center;
+      margin-top: 5px;
+    }
+
+    .search-button button {
+      padding: 8px 16px;
+      background-color: #4285F4;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .search-button button:hover {
+      background-color: #3367D6;
+    }
+
+    .location-link {
+      text-align: right;
+      font-size: 13px;
+      margin-top: -6px;
+      margin-bottom: 6px;
+    }
+
+    .location-link a {
+      color: #4285F4;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- UI Inputs -->
+  <div class="search-box">
+    <div class="input-group">
+      <span class="material-icons">radio_button_unchecked</span>
+      <input type="text" id="sourceInput" placeholder="Choose starting point..." oninput="autocomplete('source')" onkeydown="handleKey(event)">
+      <div id="sourceAuto" class="autocomplete"></div>
+    </div>
+    <div class="location-link">
+      <a href="#" onclick="useCurrentLocation()">📍 Use My Current Location</a>
+    </div>
+    <div class="input-group">
+      <span class="material-icons" style="color:red">location_on</span>
+      <input type="text" id="destinationInput" placeholder="Choose destination..." oninput="autocomplete('destination')" onkeydown="handleKey(event)">
+      <div id="destinationAuto" class="autocomplete"></div>
+    </div>
+    <div class="swap-icon" onclick="swapInputs()">
+      <span class="material-icons">swap_vert</span>
+    </div>
+    <div class="search-button">
+      <button onclick="searchInputs()">
+        <span class="material-icons" style="vertical-align: middle;">search</span> Search
+      </button>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    const map = L.map('map').setView([22.5726, 88.3639], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let sourceLatLng = null;
+    let destLatLng = null;
+    let sourceMarker = null;
+    let destMarker = null;
+    let routingControl = null;
+    let liveDot = null;
+
+    // Autocomplete
+    function autocomplete(type) {
+      const input = document.getElementById(type + "Input");
+      const dropdown = document.getElementById(type + "Auto");
+      const query = input.value;
+
+      dropdown.innerHTML = "";
+      if (query.length < 3) return;
+
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          data.slice(0, 5).forEach(place => {
+            const div = document.createElement("div");
+            div.textContent = place.display_name;
+            div.onclick = () => selectPlace(type, place);
+            dropdown.appendChild(div);
+          });
+        });
+    }
+
+    function selectPlace(type, place) {
+      const latlng = L.latLng(place.lat, place.lon);
+      const input = document.getElementById(type + "Input");
+      document.getElementById(type + "Auto").innerHTML = "";
+      input.value = place.display_name;
+
+      if (type === "source") {
+        sourceLatLng = latlng;
+        if (sourceMarker) map.removeLayer(sourceMarker);
+        sourceMarker = L.marker(latlng).addTo(map).bindPopup("Source").openPopup();
+      } else {
+        destLatLng = latlng;
+        if (destMarker) map.removeLayer(destMarker);
+        destMarker = L.marker(latlng).addTo(map).bindPopup("Destination").openPopup();
+      }
+
+      drawRouteIfBothSelected();
+    }
+
+    function drawRouteIfBothSelected() {
+      if (sourceLatLng && destLatLng) {
+        if (routingControl) map.removeControl(routingControl);
+        routingControl = L.Routing.control({
+          waypoints: [sourceLatLng, destLatLng],
+          routeWhileDragging: false
+        }).addTo(map);
+      }
+    }
+
+    function searchInputs() {
+      const sourceText = document.getElementById("sourceInput").value.trim();
+      const destText = document.getElementById("destinationInput").value.trim();
+      if (!sourceText || !destText) return alert("Enter both locations.");
+
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(sourceText)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.length) throw new Error("Source not found");
+          sourceLatLng = L.latLng(data[0].lat, data[0].lon);
+          if (sourceMarker) map.removeLayer(sourceMarker);
+          sourceMarker = L.marker(sourceLatLng).addTo(map).bindPopup("Source").openPopup();
+
+          return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destText)}`);
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (!data.length) throw new Error("Destination not found");
+          destLatLng = L.latLng(data[0].lat, data[0].lon);
+          if (destMarker) map.removeLayer(destMarker);
+          destMarker = L.marker(destLatLng).addTo(map).bindPopup("Destination").openPopup();
+          drawRouteIfBothSelected();
+        })
+        .catch(err => alert(err.message));
+    }
+
+    function handleKey(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        searchInputs();
+      }
+    }
+
+    function swapInputs() {
+      const sInput = document.getElementById("sourceInput");
+      const dInput = document.getElementById("destinationInput");
+
+      [sInput.value, dInput.value] = [dInput.value, sInput.value];
+      [sourceLatLng, destLatLng] = [destLatLng, sourceLatLng];
+
+      if (sourceMarker) map.removeLayer(sourceMarker);
+      if (destMarker) map.removeLayer(destMarker);
+      if (sourceLatLng)
+        sourceMarker = L.marker(sourceLatLng).addTo(map).bindPopup("Source").openPopup();
+      if (destLatLng)
+        destMarker = L.marker(destLatLng).addTo(map).bindPopup("Destination").openPopup();
+
+      drawRouteIfBothSelected();
+    }
+
+    function useCurrentLocation() {
+      if (!navigator.geolocation) {
+        alert("Geolocation not supported");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        sourceLatLng = L.latLng(lat, lon);
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById("sourceInput").value = data.display_name || `${lat}, ${lon}`;
+            if (sourceMarker) map.removeLayer(sourceMarker);
+            sourceMarker = L.marker(sourceLatLng).addTo(map).bindPopup("Current Location").openPopup();
+            drawRouteIfBothSelected();
+          });
+
+      }, () => alert("Unable to get your location"));
+    }
+
+    // BONUS: Auto-use current location on load & live tracking
+    navigator.geolocation.watchPosition(pos => {
+      const latlng = [pos.coords.latitude, pos.coords.longitude];
+      if (!liveDot) {
+        liveDot = L.circleMarker(latlng, { radius: 6, color: "blue" }).addTo(map).bindPopup("You");
+        map.setView(latlng, 14);
+      } else {
+        liveDot.setLatLng(latlng);
+      }
+
+      if (!sourceLatLng) {
+        useCurrentLocation(); // First time only
+      }
+    });
+    
+    // BONUS: Allow user to set destination by clicking map
+    map.on("click", e => {
+      if (!destLatLng) {
+        destLatLng = e.latlng;
+        if (destMarker) map.removeLayer(destMarker);
+        destMarker = L.marker(destLatLng).addTo(map).bindPopup("Destination (from click)").openPopup();
+        drawRouteIfBothSelected();
+      }
+    });
+  </script>
+
+</body>
+</html>
