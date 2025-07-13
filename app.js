@@ -71,4 +71,23 @@ const allSelects = document.querySelectorAll(".selectLocation");
         container.style.display = 'block';
       }
     }
+
+function redirectToMapWithParams() {
+    const sourceInput = document.getElementById("sourceInput").value;
+    const destinationInput = document.getElementById("destinationInput").value;
+    
+    // Validate inputs
+    if (!sourceInput || !destinationInput) {
+        alert("Please enter both source and destination locations");
+        return;
+    }
+    
+    // Encode the values for URL
+    const encodedSource = encodeURIComponent(sourceInput);
+    const encodedDestination = encodeURIComponent(destinationInput);
+    
+    // Redirect to map page with parameters
+    window.location.href = `maps.html?source=${encodedSource}&destination=${encodedDestination}`;
+}
+    
   

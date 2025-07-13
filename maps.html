@@ -11,295 +11,495 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
 
-  <!-- Icons -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
     html, body { margin: 0; padding: 0; height: 100%; font-family: Arial; }
-    #map { width: 500px;  height: 500px;}
+    #map { width: 100%; height: 500px; margin-top: 20px; }
 
-    .search-box {
-      position: absolute;
-      top: 20px;
-      left: 20%;
-      transform: translateX(-50%);
-      background: white;
-      padding: 12px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      z-index: 1000;
-      width: 330px;
+    .search-container {
+      background: #e8e8e8; 
+      border-radius: 20px; 
+      padding: 30px; 
+      max-width: 400px; 
+      width: 100%; 
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+      margin-bottom: 20px;
     }
 
-    .input-group {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 5px 10px;
-      position: relative;
+    .input-container {
+      position: relative; 
+      margin-bottom: 20px;
     }
 
-    .input-group input {
-      border: none;
-      outline: none;
-      flex: 1;
-      padding: 8px;
-      font-size: 14px;
+    .input-icon {
+      position: absolute; 
+      left: 18px; 
+      top: 50%; 
+      transform: translateY(-50%); 
+      width: 20px; 
+      height: 20px; 
+      color: #333; 
+      font-size: 18px;
     }
 
-    .autocomplete {
-      background: #fff;
-      border: 1px solid #ccc;
-      max-height: 150px;
+    .input-field {
+      width: 100%; 
+      padding: 18px 60px 18px 50px; 
+      border: 2px solid #999; 
+      border-radius: 15px; 
+      font-size: 16px; 
+      background: white; 
+      color: #333; 
+      transition: all 0.2s; 
+      box-sizing: border-box;
+    }
+
+    .input-field:focus {
+      border-color: #2c4a5a; 
+      box-shadow: 0 0 0 3px rgba(44, 74, 90, 0.1);
+    }
+
+    .autocomplete-dropdown {
+      position: absolute; 
+      width: calc(100% - 40px); 
+      background: white; 
+      border: 1px solid #ddd; 
+      border-radius: 0 0 5px 5px; 
+      z-index: 1000; 
+      margin-top: 2px;
+      max-height: 200px;
       overflow-y: auto;
-      position: absolute;
-      top: 38px;
-      left: 35px;
-      right: 10px;
-      z-index: 2000;
-      border-radius: 0 0 6px 6px;
     }
 
-    .autocomplete div {
-      padding: 8px;
+    .autocomplete-item {
+      padding: 8px 15px;
       cursor: pointer;
+      border-bottom: 1px solid #eee;
     }
 
-    .autocomplete div:hover {
-      background-color: #f0f0f0;
+    .autocomplete-item:hover {
+      background-color: #f5f5f5;
     }
 
-    .swap-icon {
-      text-align: center;
-      margin: 5px auto;
-      cursor: pointer;
+    .action-button {
+      width: 100%; 
+      background: #2c4a5a; 
+      color: white; 
+      border: none; 
+      padding: 20px; 
+      border-radius: 15px; 
+      font-size: 18px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      margin-top: 20px; 
+      transition: all 0.2s;
     }
 
-    .search-button {
-      text-align: center;
-      margin-top: 5px;
-    }
-
-    .search-button button {
-      padding: 8px 16px;
-      background-color: #4285F4;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .search-button button:hover {
-      background-color: #3367D6;
-    }
-
-    .location-link {
-      text-align: right;
-      font-size: 13px;
-      margin-top: -6px;
-      margin-bottom: 6px;
-    }
-
-    .location-link a {
-      color: #4285F4;
-      text-decoration: none;
+    .action-button:hover {
+      background: #1e3a4a; 
+      transform: translateY(-2px);
     }
   </style>
 </head>
 <body>
-
-  <!-- UI Inputs -->
-  <div class="search-box">
-    <div class="input-group">
-      <span class="material-icons">radio_button_unchecked</span>
-      <input type="text" id="sourceInput" placeholder="Choose starting point..." oninput="autocomplete('source')" onkeydown="handleKey(event)">
-      <div id="sourceAuto" class="autocomplete"></div>
+  <!-- Search Container -->
+  <div class="search-container">
+    <h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px; text-align: left;">Search Route by Source and Destination</h2>
+    
+    <!-- Source Input -->
+    <div class="input-container">
+      <div class="input-icon"><i class="fas fa-location-dot"></i></div>
+      <input type="text" id="sourceInput" placeholder="From Location" class="input-field">
+      <div id="sourceAuto" class="autocomplete-dropdown"></div>
+      <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;" onclick="useCurrentLocation()">
+        <i class="fas fa-location-arrow"></i>
+      </div>
     </div>
-    <div class="location-link">
-      <a href="#" onclick="useCurrentLocation()">📍 Use My Current Location</a>
+    
+    <!-- Swap Button -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0;">
+      <div style="font-size: 24px; color: #4a5568; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;" 
+           onmouseover="this.style.transform='rotate(180deg)'" onmouseout="this.style.transform='rotate(0deg)'" onclick="swapInputs()">
+        ⇅
+      </div>
+      <div style="color: #333; font-size: 16px; font-weight: 500; cursor: pointer; text-align: right; transition: color 0.2s;" 
+           onmouseover="this.style.color='#2c4a5a'" onmouseout="this.style.color='#333'">
+        Add Stop
+      </div>
     </div>
-    <div class="input-group">
-      <span class="material-icons" style="color:red">location_on</span>
-      <input type="text" id="destinationInput" placeholder="Choose destination..." oninput="autocomplete('destination')" onkeydown="handleKey(event)">
-      <div id="destinationAuto" class="autocomplete"></div>
+    
+    <!-- Destination Input -->
+    <div class="input-container">
+      <div class="input-icon"><i class="fas fa-location-dot"></i></div>
+      <input type="text" id="destinationInput" placeholder="To Location" class="input-field">
+      <div id="destinationAuto" class="autocomplete-dropdown"></div>
+      <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;">
+        <i class="fas fa-microphone"></i>
+      </div>
     </div>
-    <div class="swap-icon" onclick="swapInputs()">
-      <span class="material-icons">swap_vert</span>
-    </div>
-    <div class="search-button">
-      <button onclick="searchInputs()">
-        <span class="material-icons" style="vertical-align: middle;">search</span> Search
-      </button>
-    </div>
+    
+    <!-- Action Buttons -->
+    <button class="action-button" onclick="searchInputs()">Search Route</button>
   </div>
 
+  <!-- Map Container -->
   <div id="map"></div>
 
   <script>
+    // Initialize map
     const map = L.map('map').setView([22.5726, 88.3639], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
+    // Routing variables
     let sourceLatLng = null;
     let destLatLng = null;
     let sourceMarker = null;
     let destMarker = null;
     let routingControl = null;
     let liveDot = null;
+    let hasUrlParams = false;
 
-    // Autocomplete
+    // Function to get URL parameters
+    function getUrlParameter(name) {
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+        const results = regex.exec(window.location.href);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    // When DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get parameters from URL
+        const sourceParam = getUrlParameter('source');
+        const destinationParam = getUrlParameter('destination');
+        
+        // Check if we have URL parameters
+        hasUrlParams = sourceParam || destinationParam;
+        
+        // Set the input values if parameters exist
+        if (sourceParam) {
+            document.getElementById('sourceInput').value = sourceParam;
+        }
+        if (destinationParam) {
+            document.getElementById('destinationInput').value = destinationParam;
+        }
+        
+        // If both parameters exist, search for the route
+        if (sourceParam && destinationParam) {
+            setTimeout(() => {
+                searchInputs();
+            }, 500);
+        }
+    });
+
+    // Autocomplete function
     function autocomplete(type) {
-      const input = document.getElementById(type + "Input");
-      const dropdown = document.getElementById(type + "Auto");
-      const query = input.value;
+        const input = document.getElementById(type + "Input");
+        const dropdown = document.getElementById(type + "Auto");
+        const query = input.value;
 
-      dropdown.innerHTML = "";
-      if (query.length < 3) return;
+        dropdown.innerHTML = "";
+        if (query.length < 3) return;
 
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
-        .then(res => res.json())
-        .then(data => {
-          data.slice(0, 5).forEach(place => {
-            const div = document.createElement("div");
-            div.textContent = place.display_name;
-            div.onclick = () => selectPlace(type, place);
-            dropdown.appendChild(div);
-          });
-        });
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                data.slice(0, 5).forEach(place => {
+                    const div = document.createElement("div");
+                    div.className = "autocomplete-item";
+                    div.textContent = place.display_name;
+                    div.onclick = () => selectPlace(type, place);
+                    dropdown.appendChild(div);
+                });
+            });
     }
 
     function selectPlace(type, place) {
-      const latlng = L.latLng(place.lat, place.lon);
-      const input = document.getElementById(type + "Input");
-      document.getElementById(type + "Auto").innerHTML = "";
-      input.value = place.display_name;
+        const latlng = L.latLng(place.lat, place.lon);
+        const input = document.getElementById(type + "Input");
+        document.getElementById(type + "Auto").innerHTML = "";
+        input.value = place.display_name;
 
-      if (type === "source") {
-        sourceLatLng = latlng;
-        if (sourceMarker) map.removeLayer(sourceMarker);
-        sourceMarker = L.marker(latlng).addTo(map).bindPopup("Source").openPopup();
-      } else {
-        destLatLng = latlng;
-        if (destMarker) map.removeLayer(destMarker);
-        destMarker = L.marker(latlng).addTo(map).bindPopup("Destination").openPopup();
-      }
+        if (type === "source") {
+            sourceLatLng = latlng;
+            if (sourceMarker) map.removeLayer(sourceMarker);
+            sourceMarker = L.marker(latlng, { 
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map).bindPopup("Source").openPopup();
+        } else {
+            destLatLng = latlng;
+            if (destMarker) map.removeLayer(destMarker);
+            destMarker = L.marker(latlng, {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background:#e74c3c;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">D</div>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map).bindPopup("Destination").openPopup();
+        }
 
-      drawRouteIfBothSelected();
+        drawRouteIfBothSelected();
     }
 
     function drawRouteIfBothSelected() {
-      if (sourceLatLng && destLatLng) {
-        if (routingControl) map.removeControl(routingControl);
-        routingControl = L.Routing.control({
-          waypoints: [sourceLatLng, destLatLng],
-          routeWhileDragging: false
-        }).addTo(map);
-      }
+        if (sourceLatLng && destLatLng) {
+            if (routingControl) map.removeControl(routingControl);
+            routingControl = L.Routing.control({
+                waypoints: [sourceLatLng, destLatLng],
+                routeWhileDragging: false,
+                show: false,
+                lineOptions: {
+                    styles: [{color: '#2c4a5a', opacity: 0.7, weight: 5}]
+                },
+                formatter: new L.Routing.Formatter({
+                    language: 'en',
+                    units: 'metric'
+                })
+            }).addTo(map);
+            
+            // Fit bounds to show entire route
+            const bounds = L.latLngBounds([sourceLatLng, destLatLng]);
+            map.fitBounds(bounds, {padding: [50, 50]});
+        }
     }
 
     function searchInputs() {
-      const sourceText = document.getElementById("sourceInput").value.trim();
-      const destText = document.getElementById("destinationInput").value.trim();
-      if (!sourceText || !destText) return alert("Enter both locations.");
+        const sourceText = document.getElementById("sourceInput").value.trim();
+        const destText = document.getElementById("destinationInput").value.trim();
+        
+        if (!sourceText || !destText) {
+            alert("Please enter both source and destination locations");
+            return;
+        }
 
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(sourceText)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (!data.length) throw new Error("Source not found");
-          sourceLatLng = L.latLng(data[0].lat, data[0].lon);
-          if (sourceMarker) map.removeLayer(sourceMarker);
-          sourceMarker = L.marker(sourceLatLng).addTo(map).bindPopup("Source").openPopup();
+        // Show loading state
+        const button = document.querySelector('.action-button');
+        const originalText = button.textContent;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+        
+        // Search for source
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(sourceText)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.length) throw new Error("Source location not found");
+                sourceLatLng = L.latLng(data[0].lat, data[0].lon);
+                if (sourceMarker) map.removeLayer(sourceMarker);
+                sourceMarker = L.marker(sourceLatLng, {
+                    icon: L.divIcon({
+                        className: 'custom-marker',
+                        html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map).bindPopup("Source").openPopup();
 
-          return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destText)}`);
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (!data.length) throw new Error("Destination not found");
-          destLatLng = L.latLng(data[0].lat, data[0].lon);
-          if (destMarker) map.removeLayer(destMarker);
-          destMarker = L.marker(destLatLng).addTo(map).bindPopup("Destination").openPopup();
-          drawRouteIfBothSelected();
-        })
-        .catch(err => alert(err.message));
+                // Search for destination
+                return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destText)}`);
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.length) throw new Error("Destination location not found");
+                destLatLng = L.latLng(data[0].lat, data[0].lon);
+                if (destMarker) map.removeLayer(destMarker);
+                destMarker = L.marker(destLatLng, {
+                    icon: L.divIcon({
+                        className: 'custom-marker',
+                        html: '<div style="background:#e74c3c;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">D</div>',
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map).bindPopup("Destination").openPopup();
+                
+                drawRouteIfBothSelected();
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+            .finally(() => {
+                button.textContent = originalText;
+            });
     }
 
     function handleKey(e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        searchInputs();
-      }
+        if (e.key === "Enter") {
+            e.preventDefault();
+            searchInputs();
+        }
     }
 
     function swapInputs() {
-      const sInput = document.getElementById("sourceInput");
-      const dInput = document.getElementById("destinationInput");
+        const sInput = document.getElementById("sourceInput");
+        const dInput = document.getElementById("destinationInput");
 
-      [sInput.value, dInput.value] = [dInput.value, sInput.value];
-      [sourceLatLng, destLatLng] = [destLatLng, sourceLatLng];
+        [sInput.value, dInput.value] = [dInput.value, sInput.value];
+        [sourceLatLng, destLatLng] = [destLatLng, sourceLatLng];
 
-      if (sourceMarker) map.removeLayer(sourceMarker);
-      if (destMarker) map.removeLayer(destMarker);
-      if (sourceLatLng)
-        sourceMarker = L.marker(sourceLatLng).addTo(map).bindPopup("Source").openPopup();
-      if (destLatLng)
-        destMarker = L.marker(destLatLng).addTo(map).bindPopup("Destination").openPopup();
+        if (sourceMarker) map.removeLayer(sourceMarker);
+        if (destMarker) map.removeLayer(destMarker);
+        if (sourceLatLng) {
+            sourceMarker = L.marker(sourceLatLng, {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map).bindPopup("Source").openPopup();
+        }
+        if (destLatLng) {
+            destMarker = L.marker(destLatLng, {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background:#e74c3c;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">D</div>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map).bindPopup("Destination").openPopup();
+        }
 
-      drawRouteIfBothSelected();
+        drawRouteIfBothSelected();
     }
 
     function useCurrentLocation() {
-      if (!navigator.geolocation) {
-        alert("Geolocation not supported");
-        return;
-      }
+        // Don't use current location if we have URL parameters
+        if (hasUrlParams) return;
+        
+        if (!navigator.geolocation) {
+            alert("Geolocation not supported by your browser");
+            return;
+        }
 
-      navigator.geolocation.getCurrentPosition(pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        sourceLatLng = L.latLng(lat, lon);
+        // Show loading state
+        const locationIcon = document.querySelector('.fa-location-arrow').parentElement;
+        locationIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
-          .then(res => res.json())
-          .then(data => {
-            document.getElementById("sourceInput").value = data.display_name || `${lat}, ${lon}`;
-            if (sourceMarker) map.removeLayer(sourceMarker);
-            sourceMarker = L.marker(sourceLatLng).addTo(map).bindPopup("Current Location").openPopup();
-            drawRouteIfBothSelected();
-          });
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                sourceLatLng = L.latLng(lat, lon);
 
-      }, () => alert("Unable to get your location"));
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById("sourceInput").value = data.display_name || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                        if (sourceMarker) map.removeLayer(sourceMarker);
+                        sourceMarker = L.marker(sourceLatLng, {
+                            icon: L.divIcon({
+                                className: 'custom-marker',
+                                html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
+                                iconSize: [30, 30]
+                            })
+                        }).addTo(map).bindPopup("Current Location").openPopup();
+                        drawRouteIfBothSelected();
+                    })
+                    .catch(err => {
+                        console.error("Reverse geocoding error:", err);
+                        document.getElementById("sourceInput").value = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                        if (sourceMarker) map.removeLayer(sourceMarker);
+                        sourceMarker = L.marker(sourceLatLng, {
+                            icon: L.divIcon({
+                                className: 'custom-marker',
+                                html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
+                                iconSize: [30, 30]
+                            })
+                        }).addTo(map).bindPopup("Current Location").openPopup();
+                    })
+                    .finally(() => {
+                        locationIcon.innerHTML = '<i class="fas fa-location-arrow"></i>';
+                    });
+            },
+            err => {
+                console.error("Geolocation error:", err);
+                alert("Unable to get your location. Please enable location services.");
+                locationIcon.innerHTML = '<i class="fas fa-location-arrow"></i>';
+            },
+            { timeout: 10000 }
+        );
     }
 
-    // BONUS: Auto-use current location on load & live tracking
-    navigator.geolocation.watchPosition(pos => {
-      const latlng = [pos.coords.latitude, pos.coords.longitude];
-      if (!liveDot) {
-        liveDot = L.circleMarker(latlng, { radius: 6, color: "blue" }).addTo(map).bindPopup("You");
-        map.setView(latlng, 14);
-      } else {
-        liveDot.setLatLng(latlng);
-      }
+    // Live location tracking (only if no URL parameters)
+    if (navigator.geolocation && !hasUrlParams) {
+        navigator.geolocation.watchPosition(
+            pos => {
+                const latlng = [pos.coords.latitude, pos.coords.longitude];
+                if (!liveDot) {
+                    liveDot = L.circleMarker(latlng, { 
+                        radius: 8, 
+                        color: "#3498db",
+                        fillColor: "#2980b9",
+                        fillOpacity: 1,
+                        weight: 2
+                    }).addTo(map).bindPopup("Your current location");
+                    map.setView(latlng, 14);
+                } else {
+                    liveDot.setLatLng(latlng);
+                }
 
-      if (!sourceLatLng) {
-        useCurrentLocation(); // First time only
-      }
-    });
+                // Only set as source if no URL parameters and no manual source
+                if (!sourceLatLng && !hasUrlParams) {
+                    useCurrentLocation();
+                }
+            },
+            err => {
+                console.error("Live tracking error:", err);
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 10000,
+                timeout: 5000
+            }
+        );
+    }
     
-    // BONUS: Allow user to set destination by clicking map
-    map.on("click", e => {
-      if (!destLatLng) {
-        destLatLng = e.latlng;
-        if (destMarker) map.removeLayer(destMarker);
-        destMarker = L.marker(destLatLng).addTo(map).bindPopup("Destination (from click)").openPopup();
-        drawRouteIfBothSelected();
-      }
+    // Allow user to set destination by clicking map
+    map.on("click", function(e) {
+        if (!destLatLng) {
+            destLatLng = e.latlng;
+            if (destMarker) map.removeLayer(destMarker);
+            destMarker = L.marker(destLatLng, {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background:#e74c3c;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">D</div>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map).bindPopup("Destination (clicked on map)").openPopup();
+            
+            // Try to reverse geocode the clicked location
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${destLatLng.lat}&lon=${destLatLng.lng}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.display_name) {
+                        document.getElementById("destinationInput").value = data.display_name;
+                    }
+                    drawRouteIfBothSelected();
+                });
+        }
+    });
+
+    // Set up event listeners
+    document.getElementById('sourceInput').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            searchInputs();
+        } else {
+            autocomplete('source');
+        }
+    });
+
+    document.getElementById('destinationInput').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            searchInputs();
+        } else {
+            autocomplete('destination');
+        }
     });
   </script>
-
 </body>
 </html>
