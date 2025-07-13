@@ -274,7 +274,7 @@
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                <button type="button" class="password-toggle" onclick="togglePassword()"><i class="fa-solid fa-eye"></i></button>
+                <button type="button" class="password-toggle" onclick="togglePassword()">'<i class="fa-solid fa-eye-slash"></i>' </button>
             </div>
 
             <div class="remember-forgot">
@@ -315,10 +315,10 @@
             
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                toggleBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+                toggleBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
             } else {
                 passwordInput.type = 'password';
-                toggleBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+                toggleBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i>' ;
             }
         }
 

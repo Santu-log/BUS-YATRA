@@ -1,0 +1,114 @@
+/* Sidebar container */
+.main_box {
+  position: relative;
+}
+
+/* Hide checkbox */
+#check {
+  display: none;
+}
+
+/* Button to open sidebar */
+.btn_one {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Sidebar styles */
+.sidebar_menu  {
+  position: fixed;
+  left: -300px;
+  top: 0;
+  width: 300px;
+  height: 100px;
+  background-color: rgb(232, 237, 240);
+  transition: all 0.4s ease;
+  z-index: 999;
+  /*  */
+  
+  color: rgb(21, 20, 20);
+}
+.menu{
+   background-color: rgb(96, 163, 214);
+  transition: all 0.4s ease;
+  padding: 20px;
+}
+
+.social_media{
+    /* background-color: gray; */
+  transition: all 0.4s ease;
+  padding: 10px;
+}
+/* Show sidebar when checkbox checked */
+#check:checked ~ .sidebar_menu {
+  left: 0;
+}
+
+/* Sidebar Logo */
+.sidebar_menu .logo a {
+  font-size: 22px;
+  font-weight: bold;
+  color: rgb(168, 162, 202);
+  text-decoration: none;
+}
+
+/* Close button */
+.btn_two {
+  text-align: right;
+    background-color: rgb(232, 237, 240);
+  font-size: 22px;
+  
+}
+
+/* Menu list */
+.sidebar_menu .menu ul {
+  margin-top: 30px;
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar_menu .menu ul li {
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar_menu .menu ul li i {
+  font-size: 18px;
+  color: #171717;
+}
+
+.sidebar_menu .menu ul li a {
+  color: #171717;
+  text-decoration: none;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.sidebar_menu .menu ul li a:hover {
+  text-decoration: underline;
+  color: #171717;
+}
+
+/* Social media */
+.social_media ul {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding: 0;
+}
+
+.social_media ul li {
+  list-style: none;
+}
+
+.social_media ul li a {
+  color: #fff;
+  font-size: 20px;
+  transition: 0.3s;
+}
+
+.social_media ul li a:hover {
+  color: #1eeb8f;
+}
