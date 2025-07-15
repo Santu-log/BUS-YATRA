@@ -6,115 +6,96 @@ allSelects.forEach(select => {
 
     input.value = select.value;
 
-    select.addEventListener("change", function () {
+    select.addEventListener("change", function() {
         input.value = this.value;
     });
 });
 
-// Switch source and destination when clicking the switch symbol
-document.querySelector('.switch-locations').addEventListener('click', function() {
-    const sourceInput = document.getElementById('sourceInput');
-    const destinationInput = document.getElementById('destinationInput');
-    
-    // Swap the values
-    const temp = sourceInput.value;
-    sourceInput.value = destinationInput.value;
-    destinationInput.value = temp;
-    
-    // Optional: Trigger a search automatically after switching
-    // searchRoutes();
-});
-
-
-
-
-
+// Initialize variables
 let allRoutes = [];
 let routeData = [];
 
+// DOM elements
 const fetchBtn = document.getElementById('fetchBtn');
 const input = document.getElementById('routeSelect');
 const container = document.getElementById('routeDetails');
 
-fetchBtn.addEventListener('click', handleSearch);
-input.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') handleSearch();
+// Create dropdown for suggestions
+const suggestionsDropdown = document.createElement('div');
+suggestionsDropdown.id = 'suggestionsDropdown';
+suggestionsDropdown.className = 'suggestions-dropdown';
+suggestionsDropdown.style.cssText = `
+    display: none;
+    position: absolute;
+    width: calc(100% - 40px);
+    max-height: 250px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    margin-top: 5px;
+    padding: 8px 0;
+`;
+input.parentNode.appendChild(suggestionsDropdown);
+
+// Event delegation for suggestion clicks
+suggestionsDropdown.addEventListener('click', (e) => {
+    const suggestionItem = e.target.closest('.suggestion-item');
+    if (!suggestionItem) return;
+
+    const route = JSON.parse(suggestionItem.getAttribute('data-route'));
+    input.value = route.route_number;
+    suggestionsDropdown.style.display = 'none';
+    displayRouteDetails(route);
 });
 
-function handleSearch() {
-    const searchValue = input.value.trim().toLowerCase();
-
-    if (!searchValue) {
-        container.innerHTML = `<p style="color: red;">Please enter a route number or location.</p>`;
-        container.style.display = 'block';
-        return;
-    }
-
-    if (allRoutes.length === 0) {
-        container.innerHTML = `<p>Loading routes...</p>`;
-        container.style.display = 'block';
-
-        fetch('data.json')
-            .then(response => response.json())
-            .then(data => {
-                allRoutes = data;
-                routeData = data; // Also populate routeData for the search function
-                showRouteDetails(searchValue);
-            })
-            .catch(error => {
-                console.error('Error loading JSON:', error);
-                container.innerHTML = `<p style="color: red;">Failed to load route data.</p>`;
-            });
-    } else {
-        showRouteDetails(searchValue);
-    }
-}
-
-function showRouteDetails(searchValue) {
-    const route = allRoutes.find(r =>
-        r.route_number.toLowerCase() === searchValue ||
-        r.originating_point.toLowerCase().includes(searchValue) ||
-        r.terminating_point.toLowerCase().includes(searchValue)
-    );
-
-    if (route) {
-        container.innerHTML = `
-            <h2 style="font-weight: bold; font-size: 20px; margin-bottom: 10px;">Route ${route.route_number}</h2>
-            <p><strong>From:</strong> ${route.originating_point}</p>
-            <p><strong>To:</strong> ${route.terminating_point}</p>
-            <p><strong>Stoppages:</strong></p>
-            <ul style="list-style: disc; padding-left: 20px;">${route.stoppages.map(stop => `<li>${stop}</li>`).join('')}</ul>
-        `;
-        container.style.display = 'block';
-    } else {
-        container.innerHTML = `<p style="color: red;">No route found for "${input.value}".</p>`;
-        container.style.display = 'block';
-    }
-}
-
-function redirectToMapWithParams() {
-    const sourceInput = document.getElementById("sourceInput").value;
-    const destinationInput = document.getElementById("destinationInput").value;
+// Load route data when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    fetchRouteData();
     
-    if (!sourceInput || !destinationInput) {
-        alert("Please enter both source and destination locations");
-        return;
-    }
+    // Event listeners for search functionality
+    fetchBtn.addEventListener('click', handleSearch);
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') handleSearch();
+    });
     
-    const encodedSource = encodeURIComponent(sourceInput);
-    const encodedDestination = encodeURIComponent(destinationInput);
+    // Autocomplete functionality with debouncing
+    let debounceTimer;
+    input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            const searchTerm = this.value.trim();
+            if (searchTerm.length > 0 && allRoutes.length > 0) {
+                showSuggestions(searchTerm);
+            } else {
+                suggestionsDropdown.style.display = 'none';
+            }
+        }, 300);
+    });
     
-    window.location.href = `maps.html?source=${encodedSource}&destination=${encodedDestination}`;
-}
+    // Close dropdown when clicking outside or pressing Escape
+    document.addEventListener('click', function(e) {
+        if (e.target !== input) {
+            suggestionsDropdown.style.display = 'none';
+        }
+    });
+    
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            suggestionsDropdown.style.display = 'none';
+        }
+    });
+});
 
+// Fetch route data from JSON
 async function fetchRouteData() {
     try {
         const response = await fetch('data.json');
-        if (!response.ok) {
-            throw new Error('Failed to fetch route data');
-        }
+        if (!response.ok) throw new Error('Failed to fetch route data');
         routeData = await response.json();
-        allRoutes = routeData; // Keep both variables in sync
+        allRoutes = routeData;
         console.log('Route data loaded successfully');
     } catch (error) {
         console.error('Error loading route data:', error);
@@ -122,10 +103,137 @@ async function fetchRouteData() {
         errorElement.style.color = 'red';
         errorElement.style.marginTop = '20px';
         errorElement.textContent = 'Error loading route data. Please try again later.';
-        document.getElementById('s&d').appendChild(errorElement);
+        document.getElementById('usingname').appendChild(errorElement);
     }
 }
 
+// Show autocomplete suggestions
+function showSuggestions(searchTerm) {
+    const isRouteNumberSearch = /^[a-z0-9]+$/i.test(searchTerm);
+    
+    const matchingRoutes = allRoutes.filter(route => {
+        if (isRouteNumberSearch) {
+            const routeNumber = route.route_number.toLowerCase();
+            return routeNumber.startsWith(searchTerm) || 
+                   routeNumber.replace(/\s+/g, '').startsWith(searchTerm);
+        } else {
+            return route.originating_point.toLowerCase().includes(searchTerm) ||
+                   route.terminating_point.toLowerCase().includes(searchTerm);
+        }
+    });
+
+    if (matchingRoutes.length === 0) {
+        suggestionsDropdown.style.display = 'none';
+        return;
+    }
+
+    suggestionsDropdown.innerHTML = matchingRoutes.map(route => `
+        <div class="suggestion-item" 
+             data-route='${JSON.stringify(route).replace(/'/g, "\\'")}'
+             style="
+                 padding: 10px 15px;
+                 cursor: pointer;
+                 transition: all 0.2s;
+                 font-size: 14px;
+                 color: #333;
+                 border-bottom: 1px solid #f0f0f0;
+             "
+             onmouseover="this.style.backgroundColor='#f8f9fa'; this.style.color='#2c4a5a'" 
+             onmouseout="this.style.backgroundColor='white'; this.style.color='#333'">
+            <div style="font-weight: 600; margin-bottom: 2px;">${route.route_number}</div>
+            <div style="font-size: 13px; color: #666;">
+                ${route.originating_point} → ${route.terminating_point}
+            </div>
+        </div>
+    `).join('');
+
+    // Remove border from last item
+    const items = suggestionsDropdown.querySelectorAll('.suggestion-item');
+    if (items.length > 0) {
+        items[items.length - 1].style.borderBottom = 'none';
+    }
+
+    suggestionsDropdown.style.display = 'block';
+}
+
+// Handle search functionality
+function handleSearch() {
+    const searchValue = input.value.trim().toLowerCase();
+    suggestionsDropdown.style.display = 'none';
+
+    if (!searchValue) {
+        container.innerHTML = `<p style="color: red;">Please enter a route number or location.</p>`;
+        container.style.display = 'block';
+        return;
+    }
+
+    const isRouteNumberSearch = /^[a-z0-9]+$/i.test(searchValue);
+    const route = allRoutes.find(r => {
+        if (isRouteNumberSearch) {
+            const routeNumber = r.route_number.toLowerCase();
+            return routeNumber === searchValue || 
+                   routeNumber.replace(/\s+/g, '') === searchValue;
+        } else {
+            return r.originating_point.toLowerCase().includes(searchValue) ||
+                   r.terminating_point.toLowerCase().includes(searchValue);
+        }
+    });
+
+    if (route) {
+        displayRouteDetails(route);
+    } else {
+        container.innerHTML = `<p style="color: red;">No route found for "${input.value}".</p>`;
+        container.style.display = 'block';
+    }
+}
+
+// Display route details
+function displayRouteDetails(route) {
+    container.innerHTML = `
+        <h2 style="font-weight: bold; font-size: 20px; margin-bottom: 10px;">Route ${route.route_number}</h2>
+        <p><strong>From:</strong> ${route.originating_point}</p>
+        <p><strong>To:</strong> ${route.terminating_point}</p>
+        <p><strong>Stoppages:</strong></p>
+        <ul style="list-style: disc; padding-left: 20px;">${route.stoppages.map(stop => `<li>${stop}</li>`).join('')}</ul>
+        
+        <div style="margin-top: 15px;">
+            <button onclick="showRouteOnMap('${route.route_number}', '${route.originating_point}', '${route.terminating_point}', ${JSON.stringify(route.stoppages)})" 
+                    style="
+                        width: 100%;
+                        background: #2c4a5a;
+                        color: white;
+                        border: none;
+                        padding: 12px;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                    "
+                    onmouseover="this.style.backgroundColor='#1e3a4a'; this.style.transform='translateY(-2px)'"
+                    onmouseout="this.style.backgroundColor='#2c4a5a'; this.style.transform='translateY(0)'">
+                <i class="fas fa-map-marked-alt"></i>
+                View Route on Map
+            </button>
+        </div>
+    `;
+    container.style.display = 'block';
+}
+
+// Source/Destination switching functionality
+document.querySelector('.switch-locations').addEventListener('click', function() {
+    const sourceInput = document.getElementById('sourceInput');
+    const destinationInput = document.getElementById('destinationInput');
+    const temp = sourceInput.value;
+    sourceInput.value = destinationInput.value;
+    destinationInput.value = temp;
+});
+
+// Source/Destination search functionality
 function searchRoutes() {
     const source = document.getElementById('sourceInput').value.trim().toLowerCase();
     const destination = document.getElementById('destinationInput').value.trim().toLowerCase();
@@ -140,7 +248,6 @@ function searchRoutes() {
         const origin = route.originating_point.toLowerCase();
         const terminus = route.terminating_point.toLowerCase();
         
-        // Check if both locations exist in the route
         const sourceIsOrigin = origin.includes(source);
         const sourceIsTerminus = terminus.includes(source);
         const sourceInStops = routeStops.some(stop => stop.includes(source));
@@ -154,18 +261,13 @@ function searchRoutes() {
             return false;
         }
         
-        // Get precise indices if they're stops
         const sourceIndex = sourceInStops ? routeStops.findIndex(stop => stop.includes(source)) : -1;
         const destIndex = destInStops ? routeStops.findIndex(stop => stop.includes(destination)) : -1;
         
-        // Check all possible valid combinations
         return (
-            // Normal direction cases
             (sourceIsOrigin && (destIsTerminus || destInStops)) ||
             (sourceInStops && destIsTerminus) ||
             (sourceInStops && destInStops && sourceIndex < destIndex) ||
-            
-            // Reverse direction cases
             (sourceIsTerminus && (destIsOrigin || destInStops)) ||
             (sourceInStops && destIsOrigin) ||
             (sourceInStops && destInStops && sourceIndex > destIndex)
@@ -202,7 +304,6 @@ function displayResults(routes, source, destination) {
                         const origin = route.originating_point.toLowerCase();
                         const terminus = route.terminating_point.toLowerCase();
                         
-                        // Determine direction
                         const sourceIsOrigin = origin.includes(source);
                         const sourceIsTerminus = terminus.includes(source);
                         const sourceIndex = routeStops.findIndex(stop => stop.includes(source));
@@ -214,17 +315,53 @@ function displayResults(routes, source, destination) {
                         );
                         
                         return `
-                            <li style="margin-bottom: 10px; padding: 8px; background: white; border-radius: 5px;">
-                                <strong style="font-size: 1.1em;">Route ${route.route_number}</strong>
-                                ${isReverseDirection ? 
-                                    `<span style="font-size: 0.8em; color: #666; margin-left: 10px;">(Reverse Direction)</span>` : ''}
-                                <br>
-                                <span style="font-size: 0.9em; color: #555;">
-                                    ${route.originating_point} → ${route.terminating_point}
-                                </span>
-                                <div style="margin-top: 5px; font-size: 0.85em;">
-                                    <strong>Stops:</strong> 
-                                    ${route.stoppages.join(' → ')}
+                            <li style="margin-bottom: 15px; padding: 12px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <strong style="font-size: 16px;">Route ${route.route_number}</strong>
+                                        ${isReverseDirection ? 
+                                            `<span style="font-size: 0.8em; color: #666; margin-left: 10px;">(Reverse Direction)</span>` : ''}
+                                        <div style="font-size: 14px; color: #555; margin-top: 4px;">
+                                            ${route.originating_point} → ${route.terminating_point}
+                                        </div>
+                                    </div>
+                                    <a href="#" class="toggle-stops" 
+                                       data-route-id="${route.route_number.replace(/\s+/g, '-')}" 
+                                       style="font-size: 14px; color: #2c4a5a; text-decoration: none; padding: 6px 10px; border-radius: 4px;"
+                                       onmouseover="this.style.backgroundColor='#f0f2f5'" 
+                                       onmouseout="this.style.backgroundColor='transparent'"
+                                       onclick="toggleStops(event, '${route.route_number.replace(/\s+/g, '-')}')">
+                                        Show Stops
+                                    </a>
+                                </div>
+                                <div id="stops-${route.route_number.replace(/\s+/g, '-')}" 
+                                     style="display: none; margin-top: 10px; font-size: 14px; padding: 10px; background: #f0f2f5; border-radius: 6px;">
+                                    <strong style="color: #2c4a5a;">Stops:</strong> 
+                                    <div style="margin-top: 6px;">${route.stoppages.join(' → ')}</div>
+                                </div>
+                                <div style="margin-top: 12px;">
+                                    <button onclick="showRouteOnMap('${route.route_number}', '${route.originating_point}', '${route.terminating_point}', ${JSON.stringify(route.stoppages)})" 
+                                            style="
+                                                width: 100%;
+                                                background: #2c4a5a;
+                                                color: white;
+                                                border: none;
+                                                padding: 10px;
+                                                border-radius: 6px;
+                                                font-size: 14px;
+                                                font-weight: 600;
+                                                cursor: pointer;
+                                                transition: all 0.2s;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                                gap: 8px;
+                                            "
+                                            onmouseover="this.style.background='#1e3a4a'; this.style.transform='translateY(-2px)'"
+                                            onmouseout="this.style.background='#2c4a5a'; this.style.transform='translateY(0)'">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        View on Map
+                                    </button>
                                 </div>
                             </li>
                         `;
@@ -242,15 +379,28 @@ function displayResults(routes, source, destination) {
     document.getElementById('s&d').appendChild(resultsContainer);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    fetchRouteData();
+function toggleStops(event, routeId) {
+    event.preventDefault();
+    const stopsElement = document.getElementById(`stops-${routeId}`);
+    if (stopsElement.style.display === 'none' || !stopsElement.style.display) {
+        stopsElement.style.display = 'block';
+    } else {
+        stopsElement.style.display = 'none';
+    }
+}
+
+function showRouteOnMap(routeNumber, origin, destination, stops) {
+    // Create a string representation of the route
+    const routeInfo = {
+        number: routeNumber,
+        origin: origin,
+        destination: destination,
+        stops: stops
+    };
     
-    document.querySelector('#s&d button:first-of-type').addEventListener('click', searchRoutes);
+    // Store in sessionStorage to pass to map page
+    sessionStorage.setItem('routeData', JSON.stringify(routeInfo));
     
-    document.getElementById('sourceInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') searchRoutes();
-    });
-    document.getElementById('destinationInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') searchRoutes();
-    });
-});
+    // Redirect to map page
+    window.location.href = 'maps.html';
+}

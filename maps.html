@@ -15,41 +15,52 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; font-family: Arial; }
-    #map { width: 100%; height: 500px; margin-top: 20px; }
+    html, body { 
+      margin: 0; 
+      padding: 0; 
+      height: 100%; 
+      font-family: Arial, sans-serif;
+    }
+    
+    #map { 
+      width: 100%; 
+      height: 100%; 
+    }
 
     .search-container {
-      background: #e8e8e8; 
-      border-radius: 20px; 
-      padding: 30px; 
-      max-width: 400px; 
-      width: 100%; 
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 350px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       margin-bottom: 20px;
     }
 
     .input-container {
       position: relative; 
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .input-icon {
       position: absolute; 
-      left: 18px; 
+      left: 15px; 
       top: 50%; 
       transform: translateY(-50%); 
-      width: 20px; 
-      height: 20px; 
-      color: #333; 
-      font-size: 18px;
+      color: #555; 
+      font-size: 16px;
     }
 
     .input-field {
       width: 100%; 
-      padding: 18px 60px 18px 50px; 
-      border: 2px solid #999; 
-      border-radius: 15px; 
-      font-size: 16px; 
+      padding: 12px 45px 12px 40px; 
+      border: 1px solid #ddd; 
+      border-radius: 10px; 
+      font-size: 14px; 
       background: white; 
       color: #333; 
       transition: all 0.2s; 
@@ -58,29 +69,32 @@
 
     .input-field:focus {
       border-color: #2c4a5a; 
-      box-shadow: 0 0 0 3px rgba(44, 74, 90, 0.1);
+      box-shadow: 0 0 0 2px rgba(44, 74, 90, 0.1);
+      outline: none;
     }
 
     .autocomplete-dropdown {
       position: absolute; 
-      width: calc(100% - 40px); 
+      width: calc(100% - 30px); 
       background: white; 
       border: 1px solid #ddd; 
+      border-top: none;
       border-radius: 0 0 5px 5px; 
-      z-index: 1000; 
-      margin-top: 2px;
+      z-index: 1001; 
       max-height: 200px;
       overflow-y: auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     .autocomplete-item {
       padding: 8px 15px;
       cursor: pointer;
       border-bottom: 1px solid #eee;
+      font-size: 14px;
     }
 
     .autocomplete-item:hover {
-      background-color: #f5f5f5;
+      background-color: #f8f9fa;
     }
 
     .action-button {
@@ -88,64 +102,158 @@
       background: #2c4a5a; 
       color: white; 
       border: none; 
-      padding: 20px; 
-      border-radius: 15px; 
-      font-size: 18px; 
+      padding: 12px; 
+      border-radius: 10px; 
+      font-size: 16px; 
       font-weight: 600; 
       cursor: pointer; 
-      margin-top: 20px; 
+      margin-top: 10px; 
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .action-button:hover {
       background: #1e3a4a; 
       transform: translateY(-2px);
     }
+
+    .action-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .swap-button {
+      font-size: 20px; 
+      color: #4a5568; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      transition: all 0.2s;
+      background: none;
+      border: none;
+      padding: 5px;
+      margin: 0 auto;
+    }
+
+    .swap-button:hover {
+      transform: rotate(180deg);
+    }
+
+    .route-info {
+      background: rgba(255, 255, 255, 0.9);
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 350px;
+      width: 90%;
+    }
+
+    .route-info h3 {
+      margin: 0 0 10px 0;
+      color: #2c4a5a;
+      font-size: 16px;
+    }
+
+    .route-info p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .distance-info {
+      font-weight: bold;
+      color: #2c4a5a;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      flex-direction: column;
+    }
+
+    @media (max-width: 768px) {
+      .search-container {
+        top: 10px;
+        left: 10px;
+        padding: 15px;
+        max-width: calc(100% - 20px);
+      }
+      
+      .route-info {
+        bottom: 10px;
+        left: 10px;
+        max-width: calc(100% - 20px);
+      }
+    }
   </style>
 </head>
 <body>
   <!-- Search Container -->
   <div class="search-container">
-    <h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px; text-align: left;">Search Route by Source and Destination</h2>
+    <h2 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; text-align: left;">Search Route</h2>
     
     <!-- Source Input -->
     <div class="input-container">
       <div class="input-icon"><i class="fas fa-location-dot"></i></div>
-      <input type="text" id="sourceInput" placeholder="From Location" class="input-field">
-      <div id="sourceAuto" class="autocomplete-dropdown"></div>
-      <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;" onclick="useCurrentLocation()">
+      <input type="text" id="sourceInput" placeholder="From Location" class="input-field" autocomplete="off">
+      <div id="sourceAuto" class="autocomplete-dropdown" style="display: none;"></div>
+      <div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #555; cursor: pointer; font-size: 16px;" onclick="useCurrentLocation()">
         <i class="fas fa-location-arrow"></i>
       </div>
     </div>
     
     <!-- Swap Button -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0;">
-      <div style="font-size: 24px; color: #4a5568; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;" 
-           onmouseover="this.style.transform='rotate(180deg)'" onmouseout="this.style.transform='rotate(0deg)'" onclick="swapInputs()">
-        ⇅
-      </div>
-      <div style="color: #333; font-size: 16px; font-weight: 500; cursor: pointer; text-align: right; transition: color 0.2s;" 
-           onmouseover="this.style.color='#2c4a5a'" onmouseout="this.style.color='#333'">
-        Add Stop
-      </div>
-    </div>
+    <button class="swap-button" onclick="swapInputs()" title="Swap locations">
+      <i class="fas fa-exchange-alt"></i>
+    </button>
     
     <!-- Destination Input -->
     <div class="input-container">
       <div class="input-icon"><i class="fas fa-location-dot"></i></div>
-      <input type="text" id="destinationInput" placeholder="To Location" class="input-field">
-      <div id="destinationAuto" class="autocomplete-dropdown"></div>
-      <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;">
-        <i class="fas fa-microphone"></i>
-      </div>
+      <input type="text" id="destinationInput" placeholder="To Location" class="input-field" autocomplete="off">
+      <div id="destinationAuto" class="autocomplete-dropdown" style="display: none;"></div>
     </div>
     
     <!-- Action Buttons -->
-    <button class="action-button" onclick="searchInputs()">Search Route</button>
+    <button class="action-button" onclick="searchInputs()" id="searchButton">
+      <i class="fas fa-route"></i> Search Route
+    </button>
+  </div>
+
+  <!-- Route Information Panel -->
+  <div class="route-info" id="routeInfo" style="display: none;">
+    <h3>Route Information</h3>
+    <p><strong>From:</strong> <span id="sourceInfo"></span></p>
+    <p><strong>To:</strong> <span id="destinationInfo"></span></p>
+    <p class="distance-info"><span id="distanceInfo"></span> • <span id="timeInfo"></span></p>
   </div>
 
   <!-- Map Container -->
   <div id="map"></div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <i class="fas fa-spinner fa-spin fa-2x"></i>
+    <p id="loadingText" style="margin-top: 15px;">Searching route...</p>
+  </div>
 
   <script>
     // Initialize map
@@ -163,6 +271,7 @@
     let routingControl = null;
     let liveDot = null;
     let hasUrlParams = false;
+    let currentRoute = null;
 
     // Function to get URL parameters
     function getUrlParameter(name) {
@@ -180,6 +289,45 @@
         const sourceParam = getUrlParameter('source');
         const destinationParam = getUrlParameter('destination');
         
+
+// -- Insert begins --
+const routeDataStr = sessionStorage.getItem('routeData');
+if (routeDataStr) {
+    try {
+        const routeData = JSON.parse(routeDataStr);
+        const { origin, destination } = routeData;
+
+        document.getElementById('sourceInput').value = origin;
+        document.getElementById('destinationInput').value = destination;
+
+        Promise.all([geocodeLocation(origin), geocodeLocation(destination)])
+            .then(([srcData, destData]) => {
+                if (!srcData.length || !destData.length) throw new Error();
+
+                sourceLatLng = L.latLng(srcData[0].lat, srcData[0].lon);
+                destLatLng = L.latLng(destData[0].lat, destData[0].lon);
+                updateSourceMarker(sourceLatLng, origin);
+                updateDestMarker(destLatLng, destination);
+                drawRouteIfBothSelected();
+            })
+            .catch(() => {
+                console.error('Could not load saved route locations');
+                alert('Failed to load saved route on map.');
+            })
+            .finally(() => {
+                sessionStorage.removeItem('routeData');
+            });
+    } catch (e) {
+        console.error('Invalid routeData in sessionStorage');
+        sessionStorage.removeItem('routeData');
+    }
+}
+// -- Insert ends --
+
+
+
+
+
         // Check if we have URL parameters
         hasUrlParams = sourceParam || destinationParam;
         
@@ -197,70 +345,137 @@
                 searchInputs();
             }, 500);
         }
+
+        // Set up event listeners for autocomplete
+        setupAutocomplete('source');
+        setupAutocomplete('destination');
     });
 
-    // Autocomplete function
-    function autocomplete(type) {
+    function setupAutocomplete(type) {
         const input = document.getElementById(type + "Input");
         const dropdown = document.getElementById(type + "Auto");
-        const query = input.value;
+
+        input.addEventListener('focus', function() {
+            if (this.value.length >= 2) {
+                autocomplete(type);
+            }
+        });
+
+        input.addEventListener('input', function() {
+            if (this.value.length >= 2) {
+                autocomplete(type);
+            } else {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== input) {
+                dropdown.style.display = 'none';
+            }
+        });
+    }
+
+    // Autocomplete function with debounce
+    let autocompleteTimeout;
+    function autocomplete(type) {
+        clearTimeout(autocompleteTimeout);
+        const input = document.getElementById(type + "Input");
+        const dropdown = document.getElementById(type + "Auto");
+        const query = input.value.trim();
 
         dropdown.innerHTML = "";
-        if (query.length < 3) return;
+        if (query.length < 2) {
+            dropdown.style.display = 'none';
+            return;
+        }
 
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
-            .then(res => res.json())
-            .then(data => {
-                data.slice(0, 5).forEach(place => {
-                    const div = document.createElement("div");
-                    div.className = "autocomplete-item";
-                    div.textContent = place.display_name;
-                    div.onclick = () => selectPlace(type, place);
-                    dropdown.appendChild(div);
+        // Show loading in dropdown
+        dropdown.innerHTML = '<div class="autocomplete-item"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+        dropdown.style.display = 'block';
+
+        autocompleteTimeout = setTimeout(() => {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`)
+                .then(res => res.json())
+                .then(data => {
+                    dropdown.innerHTML = "";
+                    if (data.length === 0) {
+                        dropdown.innerHTML = '<div class="autocomplete-item">No results found</div>';
+                        return;
+                    }
+
+                    data.forEach(place => {
+                        const div = document.createElement("div");
+                        div.className = "autocomplete-item";
+                        div.innerHTML = `
+                            <div style="font-weight:500;">${place.display_name.split(',')[0]}</div>
+                            <div style="font-size:12px;color:#666;">${place.display_name.split(',').slice(1).join(',').trim()}</div>
+                        `;
+                        div.onclick = () => selectPlace(type, place);
+                        dropdown.appendChild(div);
+                    });
+                })
+                .catch(err => {
+                    dropdown.innerHTML = '<div class="autocomplete-item">Error loading results</div>';
+                    console.error("Autocomplete error:", err);
                 });
-            });
+        }, 300);
     }
 
     function selectPlace(type, place) {
         const latlng = L.latLng(place.lat, place.lon);
         const input = document.getElementById(type + "Input");
-        document.getElementById(type + "Auto").innerHTML = "";
+        const dropdown = document.getElementById(type + "Auto");
+        
         input.value = place.display_name;
+        dropdown.style.display = "none";
 
         if (type === "source") {
             sourceLatLng = latlng;
-            if (sourceMarker) map.removeLayer(sourceMarker);
-            sourceMarker = L.marker(latlng, { 
-                icon: L.divIcon({
-                    className: 'custom-marker',
-                    html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
-                    iconSize: [30, 30]
-                })
-            }).addTo(map).bindPopup("Source").openPopup();
+            updateSourceMarker(latlng, place.display_name);
         } else {
             destLatLng = latlng;
-            if (destMarker) map.removeLayer(destMarker);
-            destMarker = L.marker(latlng, {
-                icon: L.divIcon({
-                    className: 'custom-marker',
-                    html: '<div style="background:#e74c3c;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">D</div>',
-                    iconSize: [30, 30]
-                })
-            }).addTo(map).bindPopup("Destination").openPopup();
+            updateDestMarker(latlng, place.display_name);
         }
 
         drawRouteIfBothSelected();
     }
 
+    function updateSourceMarker(latlng, name) {
+        if (sourceMarker) map.removeLayer(sourceMarker);
+        sourceMarker = L.marker(latlng, { 
+            icon: L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-map-marker-alt"></i></div>',
+                iconSize: [30, 30]
+            })
+        }).addTo(map).bindPopup(`<b>Source</b><br>${name}`).openPopup();
+    }
+
+    function updateDestMarker(latlng, name) {
+        if (destMarker) map.removeLayer(destMarker);
+        destMarker = L.marker(latlng, {
+            icon: L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background:#e74c3c;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-map-marker-alt"></i></div>',
+                iconSize: [30, 30]
+            })
+        }).addTo(map).bindPopup(`<b>Destination</b><br>${name}`).openPopup();
+    }
+
     function drawRouteIfBothSelected() {
         if (sourceLatLng && destLatLng) {
+            showLoading("Calculating route...");
+            
             if (routingControl) map.removeControl(routingControl);
+            
             routingControl = L.Routing.control({
                 waypoints: [sourceLatLng, destLatLng],
                 routeWhileDragging: false,
                 show: false,
                 lineOptions: {
-                    styles: [{color: '#2c4a5a', opacity: 0.7, weight: 5}]
+                    styles: [{color: '#2c4a5a', opacity: 0.8, weight: 5}]
                 },
                 formatter: new L.Routing.Formatter({
                     language: 'en',
@@ -268,10 +483,36 @@
                 })
             }).addTo(map);
             
-            // Fit bounds to show entire route
-            const bounds = L.latLngBounds([sourceLatLng, destLatLng]);
-            map.fitBounds(bounds, {padding: [50, 50]});
+            routingControl.on('routesfound', function(e) {
+                const routes = e.routes;
+                currentRoute = routes[0];
+                updateRouteInfo(currentRoute);
+                
+                // Fit bounds to show entire route with padding
+                const bounds = L.latLngBounds([sourceLatLng, destLatLng]);
+                map.fitBounds(bounds, {padding: [100, 100]});
+                
+                hideLoading();
+            });
+            
+            routingControl.on('routingerror', function(e) {
+                alert("Could not calculate route. Please try different locations.");
+                hideLoading();
+            });
         }
+    }
+
+    function updateRouteInfo(route) {
+        document.getElementById('routeInfo').style.display = 'block';
+        document.getElementById('sourceInfo').textContent = document.getElementById('sourceInput').value;
+        document.getElementById('destinationInfo').textContent = document.getElementById('destinationInput').value;
+        
+        // Format distance and time
+        const distance = (route.summary.totalDistance / 1000).toFixed(1);
+        const time = Math.ceil(route.summary.totalTime / 60);
+        
+        document.getElementById('distanceInfo').textContent = `${distance} km`;
+        document.getElementById('timeInfo').textContent = `${time} mins`;
     }
 
     function searchInputs() {
@@ -283,57 +524,63 @@
             return;
         }
 
-        // Show loading state
-        const button = document.querySelector('.action-button');
-        const originalText = button.textContent;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+        showLoading("Searching locations...");
+        disableButton(true);
+        
+        // Clear any existing markers and route
+        if (sourceMarker) map.removeLayer(sourceMarker);
+        if (destMarker) map.removeLayer(destMarker);
+        if (routingControl) map.removeControl(routingControl);
         
         // Search for source
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(sourceText)}`)
-            .then(res => res.json())
+        geocodeLocation(sourceText)
             .then(data => {
-                if (!data.length) throw new Error("Source location not found");
+                if (!data || data.length === 0) throw new Error("Source location not found");
                 sourceLatLng = L.latLng(data[0].lat, data[0].lon);
-                if (sourceMarker) map.removeLayer(sourceMarker);
-                sourceMarker = L.marker(sourceLatLng, {
-                    icon: L.divIcon({
-                        className: 'custom-marker',
-                        html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
-                        iconSize: [30, 30]
-                    })
-                }).addTo(map).bindPopup("Source").openPopup();
-
+                updateSourceMarker(sourceLatLng, data[0].display_name);
+                
                 // Search for destination
-                return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destText)}`);
+                return geocodeLocation(destText);
             })
-            .then(res => res.json())
             .then(data => {
-                if (!data.length) throw new Error("Destination location not found");
+                if (!data || data.length === 0) throw new Error("Destination location not found");
                 destLatLng = L.latLng(data[0].lat, data[0].lon);
-                if (destMarker) map.removeLayer(destMarker);
-                destMarker = L.marker(destLatLng, {
-                    icon: L.divIcon({
-                        className: 'custom-marker',
-                        html: '<div style="background:#e74c3c;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">D</div>',
-                        iconSize: [30, 30]
-                    })
-                }).addTo(map).bindPopup("Destination").openPopup();
+                updateDestMarker(destLatLng, data[0].display_name);
                 
                 drawRouteIfBothSelected();
             })
             .catch(err => {
                 alert(err.message);
-            })
-            .finally(() => {
-                button.textContent = originalText;
+                hideLoading();
+                disableButton(false);
             });
     }
 
-    function handleKey(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            searchInputs();
+    function geocodeLocation(query) {
+        return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+            .then(res => res.json());
+    }
+
+    function disableButton(disabled) {
+        const button = document.getElementById('searchButton');
+        button.disabled = disabled;
+        if (disabled) {
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+        } else {
+            button.innerHTML = '<i class="fas fa-route"></i> Search Route';
         }
+    }
+
+    function showLoading(message) {
+        const overlay = document.getElementById('loadingOverlay');
+        const text = document.getElementById('loadingText');
+        text.textContent = message;
+        overlay.style.display = 'flex';
+    }
+
+    function hideLoading() {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        disableButton(false);
     }
 
     function swapInputs() {
@@ -343,25 +590,18 @@
         [sInput.value, dInput.value] = [dInput.value, sInput.value];
         [sourceLatLng, destLatLng] = [destLatLng, sourceLatLng];
 
-        if (sourceMarker) map.removeLayer(sourceMarker);
-        if (destMarker) map.removeLayer(destMarker);
         if (sourceLatLng) {
-            sourceMarker = L.marker(sourceLatLng, {
-                icon: L.divIcon({
-                    className: 'custom-marker',
-                    html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
-                    iconSize: [30, 30]
-                })
-            }).addTo(map).bindPopup("Source").openPopup();
+            updateSourceMarker(sourceLatLng, dInput.value);
+        } else if (sourceMarker) {
+            map.removeLayer(sourceMarker);
+            sourceMarker = null;
         }
+        
         if (destLatLng) {
-            destMarker = L.marker(destLatLng, {
-                icon: L.divIcon({
-                    className: 'custom-marker',
-                    html: '<div style="background:#e74c3c;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">D</div>',
-                    iconSize: [30, 30]
-                })
-            }).addTo(map).bindPopup("Destination").openPopup();
+            updateDestMarker(destLatLng, sInput.value);
+        } else if (destMarker) {
+            map.removeLayer(destMarker);
+            destMarker = null;
         }
 
         drawRouteIfBothSelected();
@@ -376,53 +616,41 @@
             return;
         }
 
-        // Show loading state
-        const locationIcon = document.querySelector('.fa-location-arrow').parentElement;
-        locationIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
+        showLoading("Getting your location...");
+        
         navigator.geolocation.getCurrentPosition(
             pos => {
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
                 sourceLatLng = L.latLng(lat, lon);
 
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
-                    .then(res => res.json())
+                reverseGeocode(lat, lon)
                     .then(data => {
                         document.getElementById("sourceInput").value = data.display_name || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-                        if (sourceMarker) map.removeLayer(sourceMarker);
-                        sourceMarker = L.marker(sourceLatLng, {
-                            icon: L.divIcon({
-                                className: 'custom-marker',
-                                html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
-                                iconSize: [30, 30]
-                            })
-                        }).addTo(map).bindPopup("Current Location").openPopup();
+                        updateSourceMarker(sourceLatLng, document.getElementById("sourceInput").value);
                         drawRouteIfBothSelected();
                     })
                     .catch(err => {
                         console.error("Reverse geocoding error:", err);
                         document.getElementById("sourceInput").value = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-                        if (sourceMarker) map.removeLayer(sourceMarker);
-                        sourceMarker = L.marker(sourceLatLng, {
-                            icon: L.divIcon({
-                                className: 'custom-marker',
-                                html: '<div style="background:#2c4a5a;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">S</div>',
-                                iconSize: [30, 30]
-                            })
-                        }).addTo(map).bindPopup("Current Location").openPopup();
+                        updateSourceMarker(sourceLatLng, "Current Location");
                     })
                     .finally(() => {
-                        locationIcon.innerHTML = '<i class="fas fa-location-arrow"></i>';
+                        hideLoading();
                     });
             },
             err => {
                 console.error("Geolocation error:", err);
                 alert("Unable to get your location. Please enable location services.");
-                locationIcon.innerHTML = '<i class="fas fa-location-arrow"></i>';
+                hideLoading();
             },
-            { timeout: 10000 }
+            { timeout: 10000, enableHighAccuracy: true }
         );
+    }
+
+    function reverseGeocode(lat, lon) {
+        return fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
+            .then(res => res.json());
     }
 
     // Live location tracking (only if no URL parameters)
@@ -438,14 +666,13 @@
                         fillOpacity: 1,
                         weight: 2
                     }).addTo(map).bindPopup("Your current location");
-                    map.setView(latlng, 14);
+                    
+                    // Only center on first location if no route is displayed
+                    if (!sourceLatLng && !destLatLng) {
+                        map.setView(latlng, 14);
+                    }
                 } else {
                     liveDot.setLatLng(latlng);
-                }
-
-                // Only set as source if no URL parameters and no manual source
-                if (!sourceLatLng && !hasUrlParams) {
-                    useCurrentLocation();
                 }
             },
             err => {
@@ -463,42 +690,27 @@
     map.on("click", function(e) {
         if (!destLatLng) {
             destLatLng = e.latlng;
-            if (destMarker) map.removeLayer(destMarker);
-            destMarker = L.marker(destLatLng, {
-                icon: L.divIcon({
-                    className: 'custom-marker',
-                    html: '<div style="background:#e74c3c;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">D</div>',
-                    iconSize: [30, 30]
-                })
-            }).addTo(map).bindPopup("Destination (clicked on map)").openPopup();
-            
-            // Try to reverse geocode the clicked location
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${destLatLng.lat}&lon=${destLatLng.lng}`)
-                .then(res => res.json())
+            reverseGeocode(e.latlng.lat, e.latlng.lng)
                 .then(data => {
-                    if (data.display_name) {
-                        document.getElementById("destinationInput").value = data.display_name;
-                    }
+                    document.getElementById("destinationInput").value = data.display_name || `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+                    updateDestMarker(destLatLng, document.getElementById("destinationInput").value);
                     drawRouteIfBothSelected();
+                })
+                .catch(err => {
+                    console.error("Reverse geocoding error:", err);
+                    document.getElementById("destinationInput").value = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+                    updateDestMarker(destLatLng, "Clicked Location");
                 });
         }
     });
 
-    // Set up event listeners
-    document.getElementById('sourceInput').addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') {
-            searchInputs();
-        } else {
-            autocomplete('source');
-        }
+    // Handle Enter key in input fields
+    document.getElementById('sourceInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') searchInputs();
     });
 
-    document.getElementById('destinationInput').addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') {
-            searchInputs();
-        } else {
-            autocomplete('destination');
-        }
+    document.getElementById('destinationInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') searchInputs();
     });
   </script>
 </body>
