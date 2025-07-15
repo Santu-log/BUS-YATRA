@@ -140,7 +140,7 @@
 </br>
 
 
-   <div class="sub-head">
+   <!-- <div class="sub-head">
   <div class="option-box">
     <input type="radio" id="byRoute1" name="option" onclick="location.href='#s&d'">
     <label for="byRoute1">Use source & destination</label>
@@ -155,7 +155,7 @@
     <input type="radio" id="byRoute3" name="option" onclick="location.href='#usinglocation'">
     <label for="byRoute3">Use location</label>
   </div>
-</div>
+</div> -->
     </header>
 
 
@@ -189,8 +189,7 @@
 <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: flex-start;" >
         <!-- First Container -->
         <div style="background: #e8e8e8; border-radius: 20px; padding: 30px; max-width: 400px; width: 100%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'" id="s&d">
-            <h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px; text-align: left;">Search Route by Source and Destination</h2>
-            
+                 
             <div style="position: relative; margin-bottom: 20px;">
                 <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; font-size: 18px;"><i class="fa-solid fa-location-dot"></i></div>
                 <input type="text" placeholder="From Location" style="width: 100%; padding: 18px 60px 18px 50px; border: 2px solid #999; border-radius: 15px; font-size: 16px; background: white; color: #333; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#2c4a5a'; this.style.boxShadow='0 0 0 3px rgba(44, 74, 90, 0.1)'" onblur="this.style.borderColor='#999'; this.style.boxShadow='none'" id="sourceInput">
@@ -198,8 +197,11 @@
             </div>
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0;">
-                <div style="font-size: 24px; color: #4a5568; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;" onmouseover="this.style.transform='rotate(180deg)'" onmouseout="this.style.transform='rotate(0deg)'">⇅</div>
-                <div style="color: #333; font-size: 16px; font-weight: 500; cursor: pointer; text-align: right; transition: color 0.2s;" onmouseover="this.style.color='#2c4a5a'" onmouseout="this.style.color='#333'">Add Stop</div>
+               <div style="font-size: 24px; color: #4a5568; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;" 
+     class="switch-locations" 
+     onmouseover="this.style.transform='rotate(180deg)'" 
+     onmouseout="this.style.transform='rotate(0deg)'">⇅</div>
+        <div style="color: #333; font-size: 16px; font-weight: 500; cursor: pointer; text-align: right; transition: color 0.2s;" onmouseover="this.style.color='#2c4a5a'" onmouseout="this.style.color='#333'">Add Stop</div>
             </div>
             
             <div style="position: relative; margin-bottom: 20px;">
@@ -208,7 +210,7 @@
                 <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;"><i class="fa-solid fa-microphone"></i></div>
             </div>
             
-            <button style="width: 100%; background: #2c4a5a; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s;" onmouseover="this.style.background='#1e3a4a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2c4a5a'; this.style.transform='translateY(0)'" onmousedown="this.style.transform='translateY(0)'" onmouseup="this.style.transform='translateY(-2px)'" onclick="searchRoutes()">Search Route</button>
+            <button style="width: 100%; background: #2c4a5a; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s;" onmouseover="this.style.background='#1e3a4a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2c4a5a'; this.style.transform='translateY(0)'" onmousedown="this.style.transform='translateY(0)'" onmouseup="this.style.transform='translateY(-2px)'" onclick="searchRoutes()">Find Bus</button>
         <button onclick="redirectToMapWithParams()" style="width: 100%; background: #2c4a5a; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s;" 
         onmouseover="this.style.background='#1e3a4a'; this.style.transform='translateY(-2px)'" 
         onmouseout="this.style.background='#2c4a5a'; this.style.transform='translateY(0)'" 
@@ -218,8 +220,7 @@
         
         <!-- Second Container -->
         <div  style="background: #e8e8e8; border-radius: 20px; padding: 30px; max-width: 400px; width: 100%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'" id="usingname">
-        <h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px;">Search BUS Route for Name and NO</h2>
-
+        
         <input type="text" id="routeSelect" placeholder="Enter Bus  Name  or No" style="width: 100%; padding: 18px 60px 18px 50px; border: 2px solid #999; border-radius: 15px; font-size: 16px; background: white; color: #333; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#2c4a5a'; this.style.boxShadow='0 0 0 3px rgba(44, 74, 90, 0.1)'" onblur="this.style.borderColor='#999'; this.style.boxShadow='none'">
 
         <button id="fetchBtn" style="width: 100%; background: #2c4a5a; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 15px; transition: all 0.2s;" 
@@ -235,8 +236,8 @@
         
         <!-- Third Container -->
         <div class="routeSelect" style="background: #e8e8e8; border-radius: 20px; padding: 30px; max-width: 400px; width: 100%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'" id="usinglocation">
-            <h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px; text-align: left;">Search BUS Route for a location</h2>
-            
+            <!-- <h2 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 30px; text-align: left;">Search BUS Route for a location</h2>
+             -->
             <div style="position: relative; margin-bottom: 20px;">
                 <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; font-size: 18px;"><i class="fa-solid fa-location-dot "></i></div>
                 <input type="text" placeholder=" Location" style="width: 100%; padding: 18px 60px 18px 50px; border: 2px solid #999; border-radius: 15px; font-size: 16px; background: white; color: #333; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#2c4a5a'; this.style.boxShadow='0 0 0 3px rgba(44, 74, 90, 0.1)'" onblur="this.style.borderColor='#999'; this.style.boxShadow='none'">
