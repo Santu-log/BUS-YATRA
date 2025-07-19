@@ -98,7 +98,7 @@
     
    
     <div>
-<a href="#" class="menu-link" id="location-link"><i class="fa-solid fa-location-dot"></i> Fetch Current location</a>
+<a href="#" class="menu-link" id="location-link" onclick="fetchLocation()"><i class="fa-solid fa-location-dot"></i> Fetch Current location</a>
     
 </div>
     
@@ -118,7 +118,7 @@
         </div>
     </div> -->
     
-    <a class="btn btn-primary" href="sing_in.html" role="button">Sing in</a>
+    <a class="btn btn-primary" href="sing_in.html" role="button">Sign in</a>
 
 </div>
 </nav>
@@ -240,7 +240,11 @@
              -->
             <div style="position: relative; margin-bottom: 20px;">
                 <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; font-size: 18px;"><i class="fa-solid fa-location-dot "></i></div>
-                <input type="text" placeholder=" Location" style="width: 100%; padding: 18px 60px 18px 50px; border: 2px solid #999; border-radius: 15px; font-size: 16px; background: white; color: #333; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#2c4a5a'; this.style.boxShadow='0 0 0 3px rgba(44, 74, 90, 0.1)'" onblur="this.style.borderColor='#999'; this.style.boxShadow='none'">
+                <input type="text" placeholder=" Location" list="stopSuggestions" id="loc3" style="width: 100%; padding: 18px 60px 18px 50px; border: 2px solid #999; border-radius: 15px; font-size: 16px; background: white; color: #333; transition: all 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#2c4a5a'; this.style.boxShadow='0 0 0 3px rgba(44, 74, 90, 0.1)'" onblur="this.style.borderColor='#999'; this.style.boxShadow='none'">
+
+                <!-- <input list="stopSuggestions" id="locationInput" placeholder="Enter Location" /> -->
+                <datalist id="stopSuggestions"></datalist>
+
                 <div style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #333; cursor: pointer; font-size: 18px;"><i class="fa-solid fa-microphone"></i></div>
             </div>
             
@@ -248,7 +252,9 @@
             
             
             
-            <button style="width: 100%; background: #2c4a5a; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s;" onmouseover="this.style.background='#1e3a4a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2c4a5a'; this.style.transform='translateY(0)'" onmousedown="this.style.transform='translateY(0)'" onmouseup="this.style.transform='translateY(-2px)'">Search Bus Route</button>
+            <button id="searchButton3" style="width: 100%; background: #2c4a5a; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.2s;" onmouseover="this.style.background='#1e3a4a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2c4a5a'; this.style.transform='translateY(0)'" onmousedown="this.style.transform='translateY(0)'" onmouseup="this.style.transform='translateY(-2px)'">Search Bus Route</button>
+            <div id="resultBox"></div>
+
         </div>
     </div>
 

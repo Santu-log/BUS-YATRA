@@ -404,3 +404,197 @@ function showRouteOnMap(routeNumber, origin, destination, stops) {
     // Redirect to map page
     window.location.href = 'maps.html';
 }
+
+
+
+
+const input3 = document.getElementById('loc3');
+const button = document.getElementById('searchButton3');
+const resultBox = document.getElementById('resultBox');
+
+let busRoutes = [];
+
+fetch('data.json')
+  .then(res => res.json())
+  .then(data => {
+    busRoutes = data;
+  })
+  .catch(err => {
+    resultBox.innerHTML = `<p style="color:red;">Error loading route data.</p>`;
+  });
+
+button.addEventListener('click', () => {
+  const location = input3.value.trim().toLowerCase();
+  resultBox.innerHTML = '';
+
+  if (location === '') {
+    resultBox.innerHTML = `
+      <div style="background:#f9f9f9; padding:20px; border-radius:12px; margin-top:15px; box-shadow:0 2px 8px rgba(0,0,0,0.1); font-family:sans-serif;">
+        <p style="color:red;">Please enter a location.</p>
+      </div>`;
+    return;
+  }
+
+  const matchedRoutes = busRoutes.filter(route =>
+  route.stoppages.some(stop => stop.toLowerCase() === location)
+);
+
+
+  if (matchedRoutes.length === 0) {
+    resultBox.innerHTML = `
+      <div style="background:#f9f9f9; padding:20px; border-radius:12px; margin-top:15px; box-shadow:0 2px 8px rgba(0,0,0,0.1); font-family:sans-serif;">
+        <p style="color:red;">No routes found for "${location}".</p>
+      </div>`;
+  } else {
+    const capLocation = location.charAt(0).toUpperCase() + location.slice(1);
+    const count = matchedRoutes.length;
+
+    let resultHTML = `
+      <div style="
+        background:#f9f9f9;
+        padding:20px;
+        border-radius:12px;
+        margin-top:15px;
+        box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        font-family:sans-serif;
+        max-height:400px;
+        overflow-y:auto;
+      ">
+        <p style="font-weight:bold; color:green; font-size:16px;">
+          Found ${count} route(s) in ${capLocation}:
+        </p>`;
+
+    matchedRoutes.forEach((route, index) => {
+const stopList = `<strong>Stops:</strong><br>${route.stoppages.join(' → ')}`;
+
+  const mapBtnId = `map-${index}`;
+
+ const stopBoxId = `stops-${index}`;
+const btnId = `btn-${index}`;
+
+resultHTML += `
+  <div style="
+    margin-top:15px;
+    padding:15px;
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 1px 4px rgba(0,0,0,0.1);
+    font-family:sans-serif;
+  ">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <strong>Route ${route.route_number}</strong>
+      <button id="${btnId}" style="
+        padding:5px 10px;
+        background:#007BFF;
+        color:#fff;
+        border:none;
+        border-radius:5px;
+        font-size:12px;
+        cursor:pointer;
+      ">Show Stops</button>
+    </div>
+    
+    <p style="margin:5px 0 10px 0; font-size:14px;">
+      ${route.originating_point} → ${route.terminating_point}
+    </p>
+
+    <div id="${stopBoxId}" style="
+      display:none;
+      background:#f1f6fa;
+      border:1px solid #ccc;
+      border-radius:5px;
+      padding:10px;
+      font-size:13px;
+      line-height:1.6;
+      overflow-y:auto;
+    ">
+      <strong>Stops:</strong><br>
+      ${route.stoppages.join(' → ')}
+    </div>
+<button id="${mapBtnId}" style="
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: #274e64;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+">
+  <span style="font-size: 16px;"><i class="fas fa-map-marked-alt"></i></span> View Route on Map
+</button>
+
+  </div>
+`;
+
+});
+
+
+    resultHTML += `</div>`;
+    resultBox.innerHTML = resultHTML;
+
+    // Toggle Show/Hide for each stop list
+    matchedRoutes.forEach((route, index) => {
+      const btn = document.getElementById(`btn-${index}`);
+      const stopBox = document.getElementById(`stops-${index}`);
+      let shown = false;
+
+      btn.addEventListener('click', () => {
+        shown = !shown;
+        stopBox.style.display = shown ? 'block' : 'none';
+        btn.textContent = shown ? 'Hide Stops' : 'Show Stops';
+      });
+    });
+  }
+});
+
+// suggestionsDropdown
+fetch('data.json')
+  .then(response => response.json())
+  .then(data => {
+    const allStops = new Set();
+    const datalist = document.getElementById('stopSuggestions');
+
+    data.forEach(route => {
+      route.stoppages.forEach(stop => allStops.add(stop));
+    });
+
+    allStops.forEach(stop => {
+      const option = document.createElement('option');
+      option.value = stop;
+      datalist.appendChild(option);
+    });
+  })
+  .catch(error => {
+    console.error('Error loading suggestions:', error);
+  });
+
+
+//   view  on map button
+
+
+
+
+// fetch current location button
+ function fetchLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          // Open Google Maps with current location
+          const mapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+          window.open(mapUrl, '_blank');
+        }, function(error) {
+          alert("Error fetching location: " + error.message);
+        });
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
