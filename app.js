@@ -436,9 +436,10 @@ button.addEventListener('click', () => {
   }
 
   const matchedRoutes = busRoutes.filter(route =>
-  route.stoppages.some(stop => stop.toLowerCase() === location)
-);
-
+    route.originating_point.toLowerCase() === location ||
+    route.terminating_point.toLowerCase() === location ||
+    route.stoppages.some(stop => stop.toLowerCase() === location)
+  );
 
   if (matchedRoutes.length === 0) {
     resultBox.innerHTML = `
@@ -465,81 +466,76 @@ button.addEventListener('click', () => {
         </p>`;
 
     matchedRoutes.forEach((route, index) => {
-const stopList = `<strong>Stops:</strong><br>${route.stoppages.join(' → ')}`;
+      const stopBoxId = `stops-${index}`;
+      const btnId = `btn-${index}`;
+      const mapBtnId = `map-${index}`;
 
-  const mapBtnId = `map-${index}`;
+      resultHTML += `
+        <div style="
+          margin-top:15px;
+          padding:15px;
+          background:#fff;
+          border-radius:10px;
+          box-shadow:0 1px 4px rgba(0,0,0,0.1);
+          font-family:sans-serif;
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>Route ${route.route_number}</strong>
+            <button id="${btnId}" style="
+              padding:5px 10px;
+              background:#007BFF;
+              color:#fff;
+              border:none;
+              border-radius:5px;
+              font-size:12px;
+              cursor:pointer;
+            ">Show Stops</button>
+          </div>
 
- const stopBoxId = `stops-${index}`;
-const btnId = `btn-${index}`;
+          <p style="margin:5px 0 10px 0; font-size:14px;">
+            ${route.originating_point} → ${route.terminating_point}
+          </p>
 
-resultHTML += `
-  <div style="
-    margin-top:15px;
-    padding:15px;
-    background:#fff;
-    border-radius:10px;
-    box-shadow:0 1px 4px rgba(0,0,0,0.1);
-    font-family:sans-serif;
-  ">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <strong>Route ${route.route_number}</strong>
-      <button id="${btnId}" style="
-        padding:5px 10px;
-        background:#007BFF;
-        color:#fff;
-        border:none;
-        border-radius:5px;
-        font-size:12px;
-        cursor:pointer;
-      ">Show Stops</button>
-    </div>
-    
-    <p style="margin:5px 0 10px 0; font-size:14px;">
-      ${route.originating_point} → ${route.terminating_point}
-    </p>
+          <div id="${stopBoxId}" style="
+            display:none;
+            background:#f1f6fa;
+            border:1px solid #ccc;
+            border-radius:5px;
+            padding:10px;
+            font-size:13px;
+            line-height:1.6;
+            overflow-y:auto;
+            max-height:200px;
+          ">
+            <strong>Stops:</strong><br>
+            ${route.stoppages.join(' → ')}
+          </div>
 
-    <div id="${stopBoxId}" style="
-      display:none;
-      background:#f1f6fa;
-      border:1px solid #ccc;
-      border-radius:5px;
-      padding:10px;
-      font-size:13px;
-      line-height:1.6;
-      overflow-y:auto;
-    ">
-      <strong>Stops:</strong><br>
-      ${route.stoppages.join(' → ')}
-    </div>
-<button id="${mapBtnId}" style="
-  margin-top: 10px;
-  width: 100%;
-  padding: 10px;
-  background: #274e64;
-  color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 14px;
-">
-  <span style="font-size: 16px;"><i class="fas fa-map-marked-alt"></i></span> View Route on Map
-</button>
-
-  </div>
-`;
-
-});
-
+          <button id="${mapBtnId}" style="
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            background: #274e64;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 14px;
+          ">
+            <span style="font-size: 16px;"><i class="fas fa-map-marked-alt"></i></span> View Route on Map
+          </button>
+        </div>
+      `;
+    });
 
     resultHTML += `</div>`;
     resultBox.innerHTML = resultHTML;
 
-    // Toggle Show/Hide for each stop list
     matchedRoutes.forEach((route, index) => {
       const btn = document.getElementById(`btn-${index}`);
       const stopBox = document.getElementById(`stops-${index}`);
@@ -554,6 +550,7 @@ resultHTML += `
   }
 });
 
+
 // suggestionsDropdown
 fetch('data.json')
   .then(response => response.json())
@@ -562,9 +559,15 @@ fetch('data.json')
     const datalist = document.getElementById('stopSuggestions');
 
     data.forEach(route => {
+      // Add originating point and terminating point
+      allStops.add(route.originating_point);
+      allStops.add(route.terminating_point);
+
+      // Add all stoppages
       route.stoppages.forEach(stop => allStops.add(stop));
     });
 
+    // Add all unique stops to the datalist
     allStops.forEach(stop => {
       const option = document.createElement('option');
       option.value = stop;
