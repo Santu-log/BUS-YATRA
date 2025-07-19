@@ -377,6 +377,8 @@ function displayResults(routes, source, destination) {
     }
     
     document.getElementById('s&d').appendChild(resultsContainer);
+
+    
 }
 
 function toggleStops(event, routeId) {
@@ -390,19 +392,20 @@ function toggleStops(event, routeId) {
 }
 
 function showRouteOnMap(routeNumber, origin, destination, stops) {
-    // Create a string representation of the route
+    // Create a clean route object
     const routeInfo = {
         number: routeNumber,
         origin: origin,
         destination: destination,
-        stops: stops
+        stops: stops.filter(stop => stop !== origin && stop !== destination)
     };
     
-    // Store in sessionStorage to pass to map page
-    sessionStorage.setItem('routeData', JSON.stringify(routeInfo));
+    // Convert to JSON and encode for URL
+    const routeJson = JSON.stringify(routeInfo);
+    const encodedRoute = encodeURIComponent(routeJson);
     
-    // Redirect to map page
-    window.location.href = 'maps.html';
+    // Open in a new tab with the route data
+    window.open(`maps.html?route=${encodedRoute}`, '_blank');
 }
 
 
@@ -466,72 +469,76 @@ button.addEventListener('click', () => {
         </p>`;
 
     matchedRoutes.forEach((route, index) => {
-      const stopBoxId = `stops-${index}`;
-      const btnId = `btn-${index}`;
-      const mapBtnId = `map-${index}`;
+const stopList = `<strong>Stops:</strong><br>${route.stoppages.join(' → ')}`;
 
-      resultHTML += `
-        <div style="
-          margin-top:15px;
-          padding:15px;
-          background:#fff;
-          border-radius:10px;
-          box-shadow:0 1px 4px rgba(0,0,0,0.1);
-          font-family:sans-serif;
-        ">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong>Route ${route.route_number}</strong>
-            <button id="${btnId}" style="
-              padding:5px 10px;
-              background:#007BFF;
-              color:#fff;
-              border:none;
-              border-radius:5px;
-              font-size:12px;
-              cursor:pointer;
-            ">Show Stops</button>
-          </div>
+  const mapBtnId = `map-${index}`;
 
-          <p style="margin:5px 0 10px 0; font-size:14px;">
-            ${route.originating_point} → ${route.terminating_point}
-          </p>
+ const stopBoxId = `stops-${index}`;
+const btnId = `btn-${index}`;
 
-          <div id="${stopBoxId}" style="
-            display:none;
-            background:#f1f6fa;
-            border:1px solid #ccc;
-            border-radius:5px;
-            padding:10px;
-            font-size:13px;
-            line-height:1.6;
-            overflow-y:auto;
-            max-height:200px;
-          ">
-            <strong>Stops:</strong><br>
-            ${route.stoppages.join(' → ')}
-          </div>
+resultHTML += `
+  <div style="
+    margin-top:15px;
+    padding:15px;
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 1px 4px rgba(0,0,0,0.1);
+    font-family:sans-serif;
+  ">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <strong>Route ${route.route_number}</strong>
+      <button id="${btnId}" style="
+        padding:5px 10px;
+        background:#007BFF;
+        color:#fff;
+        border:none;
+        border-radius:5px;
+        font-size:12px;
+        cursor:pointer;
+      ">Show Stops</button>
+    </div>
+    
+    <p style="margin:5px 0 10px 0; font-size:14px;">
+      ${route.originating_point} → ${route.terminating_point}
+    </p>
 
-          <button id="${mapBtnId}" style="
-            margin-top: 10px;
-            width: 100%;
-            padding: 10px;
-            background: #274e64;
-            color: white;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 14px;
-          ">
-            <span style="font-size: 16px;"><i class="fas fa-map-marked-alt"></i></span> View Route on Map
-          </button>
-        </div>
-      `;
-    });
+    <div id="${stopBoxId}" style="
+      display:none;
+      background:#f1f6fa;
+      border:1px solid #ccc;
+      border-radius:5px;
+      padding:10px;
+      font-size:13px;
+      line-height:1.6;
+      overflow-y:auto;
+    ">
+      <strong>Stops:</strong><br>
+      ${route.stoppages.join(' → ')}
+    </div>
+<button id="${mapBtnId}" style="
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: #274e64;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+">
+  <span style="font-size: 16px;"><i class="fas fa-map-marked-alt"></i></span> View Route on Map
+</button>
+
+  </div>
+`;
+
+});
+
 
     resultHTML += `</div>`;
     resultBox.innerHTML = resultHTML;
