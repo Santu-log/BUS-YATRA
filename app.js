@@ -31,12 +31,12 @@ suggestionsDropdown.style.cssText = `
     max-height: 250px;
     overflow-y: auto;
     background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border: 1px solid #411b1bff;
+    border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    margin-top: 5px;
-    padding: 8px 0;
+    z-index:9999;
+    margin-top: 300px;
+    padding: 8px 
 `;
 input.parentNode.appendChild(suggestionsDropdown);
 
@@ -109,6 +109,7 @@ async function fetchRouteData() {
 
 // Show autocomplete suggestions
 function showSuggestions(searchTerm) {
+  searchTerm=searchTerm.toLowerCase();
     const isRouteNumberSearch = /^[a-z0-9]+$/i.test(searchTerm);
     
     const matchingRoutes = allRoutes.filter(route => {

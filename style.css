@@ -240,14 +240,21 @@ header {
     transition: transform 0.3s ease;
 }
 
+.Second-Container{
+
+    padding: 10px;
+}
+
 .dashboard-card:hover {
     transform: translateY(-5px);
 }
 
 /* Input Styles */
 .input-container {
+    /* position:static; */
     position: relative;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
+
 }
 
 .input-icon {
@@ -269,7 +276,7 @@ header {
 
 .input-field {
     width: 100%;
-    padding: 18px 60px 18px 50px;
+    padding: 10px 50px 10px 40px;
     border: 2px solid #999;
     border-radius: 15px;
     font-size: 16px;
@@ -279,6 +286,19 @@ header {
     box-sizing: border-box;
 }
 
+.input-with-button {
+    display: flex;
+    gap: 10px; /* Adds space between input and button */
+    align-items: center; /* Aligns them vertically */
+}
+.input-with-button .input-field{
+      width: 80%;
+    padding: 10px 50px 10px 40px;
+    display: flex;
+}
+
+
+
 .input-field:focus {
     border-color: #2c4a5a;
     box-shadow: 0 0 0 3px rgba(44, 74, 90, 0.1);
@@ -287,13 +307,13 @@ header {
 /* Switch Container */
 .switch-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin: 15px 0;
+    margin-top: 0px ;
 }
 
 .switch-locations {
-    font-size: 24px;
+    font-size: 20px;
     color: #4a5568;
     cursor: pointer;
     display: flex;
@@ -306,18 +326,18 @@ header {
     transform: rotate(180deg);
 }
 
-.add-stop {
+/* .add-stop {
     color: #333;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
     text-align: right;
     transition: color 0.2s;
-}
+} */
 
-.add-stop:hover {
+/* .add-stop:hover {
     color: #2c4a5a;
-}
+} */
 
 /* Button Styles */
 .primary-button {
@@ -325,13 +345,14 @@ header {
     background: #2c4a5a;
     color: white;
     border: none;
-    padding: 20px;
+    padding: 5px;
     border-radius: 15px;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 20px;
+    margin-top: 0px;
     transition: all 0.2s;
+    margin-top: 10px;
 }
 
 .primary-button:hover {
@@ -341,6 +362,10 @@ header {
 
 .primary-button:active {
     transform: translateY(0);
+}
+
+.input-with-button .primary-button{
+    width: 20%;
 }
 
 /* Route Details */
