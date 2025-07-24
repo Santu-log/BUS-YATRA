@@ -227,56 +227,56 @@ function displayRouteDetails(route) {
 
 // Source/Destination switching functionality
 document.querySelector('.switch-locations').addEventListener('click', function() {
-    const sourceInput = document.getElementById('sourceInput');
-    const destinationInput = document.getElementById('destinationInput');
+    // const sourceInput = document.getElementById('sourceInput');
+    // const destinationInput = document.getElementById('destinationInput');
     const temp = sourceInput.value;
     sourceInput.value = destinationInput.value;
     destinationInput.value = temp;
 });
 
 // Source/Destination search functionality
-function searchRoutes() {
-    const source = document.getElementById('sourceInput').value.trim().toLowerCase();
-    const destination = document.getElementById('destinationInput').value.trim().toLowerCase();
+// function searchRoutes() {
+//     // const source = document.getElementById('sourceInput').value.trim().toLowerCase();
+//     // const destination = document.getElementById('destinationInput').value.trim().toLowerCase();
     
-    if (!source || !destination) {
-        alert('Please enter both source and destination');
-        return;
-    }
+//     if (!source || !destination) {
+//         alert('Please enter both source and destination');
+//         return;
+//     }
     
-    const matchingRoutes = routeData.filter(route => {
-        const routeStops = route.stoppages.map(stop => stop.toLowerCase());
-        const origin = route.originating_point.toLowerCase();
-        const terminus = route.terminating_point.toLowerCase();
+//     const matchingRoutes = routeData.filter(route => {
+//         const routeStops = route.stoppages.map(stop => stop.toLowerCase());
+//         const origin = route.originating_point.toLowerCase();
+//         const terminus = route.terminating_point.toLowerCase();
         
-        const sourceIsOrigin = origin.includes(source);
-        const sourceIsTerminus = terminus.includes(source);
-        const sourceInStops = routeStops.some(stop => stop.includes(source));
+//         const sourceIsOrigin = origin.includes(source);
+//         const sourceIsTerminus = terminus.includes(source);
+//         const sourceInStops = routeStops.some(stop => stop.includes(source));
         
-        const destIsOrigin = origin.includes(destination);
-        const destIsTerminus = terminus.includes(destination);
-        const destInStops = routeStops.some(stop => stop.includes(destination));
+//         const destIsOrigin = origin.includes(destination);
+//         const destIsTerminus = terminus.includes(destination);
+//         const destInStops = routeStops.some(stop => stop.includes(destination));
         
-        if (!(sourceIsOrigin || sourceIsTerminus || sourceInStops) || 
-            !(destIsOrigin || destIsTerminus || destInStops)) {
-            return false;
-        }
+//         if (!(sourceIsOrigin || sourceIsTerminus || sourceInStops) || 
+//             !(destIsOrigin || destIsTerminus || destInStops)) {
+//             return false;
+//         }
         
-        const sourceIndex = sourceInStops ? routeStops.findIndex(stop => stop.includes(source)) : -1;
-        const destIndex = destInStops ? routeStops.findIndex(stop => stop.includes(destination)) : -1;
+//         const sourceIndex = sourceInStops ? routeStops.findIndex(stop => stop.includes(source)) : -1;
+//         const destIndex = destInStops ? routeStops.findIndex(stop => stop.includes(destination)) : -1;
         
-        return (
-            (sourceIsOrigin && (destIsTerminus || destInStops)) ||
-            (sourceInStops && destIsTerminus) ||
-            (sourceInStops && destInStops && sourceIndex < destIndex) ||
-            (sourceIsTerminus && (destIsOrigin || destInStops)) ||
-            (sourceInStops && destIsOrigin) ||
-            (sourceInStops && destInStops && sourceIndex > destIndex)
-        );
-    });
+//         return (
+//             (sourceIsOrigin && (destIsTerminus || destInStops)) ||
+//             (sourceInStops && destIsTerminus) ||
+//             (sourceInStops && destInStops && sourceIndex < destIndex) ||
+//             (sourceIsTerminus && (destIsOrigin || destInStops)) ||
+//             (sourceInStops && destIsOrigin) ||
+//             (sourceInStops && destInStops && sourceIndex > destIndex)
+//         );
+//     });
     
-    displayResults(matchingRoutes, source, destination);
-}
+    // displayResults(matchingRoutes, source, destination);
+// }
 
 function displayResults(routes, source, destination) {
     const resultsContainer = document.createElement('div');
@@ -609,3 +609,207 @@ fetch('data.json')
         alert("Geolocation is not supported by this browser.");
       }
     }
+
+
+
+
+// From destination to To destination search functionality
+const fromInput = document.getElementById('sourceInput');
+const toInput = document.getElementById('destinationInput');
+const button1 = document.getElementById('searchbtn1');
+const resultBox1 = document.getElementById('resultBox1');
+
+let busRoutes1 = [];
+
+fetch('data.json')
+  .then(res => res.json())
+  .then(data => {
+    busRoutes1 = data;
+  })
+  .catch(err => {
+    resultBox1.innerHTML = `<p style="color:red;">Error loading route data.</p>`;
+  });
+
+button1.addEventListener('click', () => {
+  const from = fromInput.value.trim().toLowerCase();
+  const to = toInput.value.trim().toLowerCase();
+  resultBox1.innerHTML = '';
+
+  if (from === '' || to === '') {
+    resultBox1.innerHTML = `
+      <div style="background:#f9f9f9; padding:20px; border-radius:12px; margin-top:15px; box-shadow:0 2px 8px rgba(0,0,0,0.1); font-family:sans-serif;">
+        <p style="color:red;">Please enter both 'From' and 'To' locations.</p>
+      </div>`;
+    return;
+  }
+
+ const matchedRoutes1 = busRoutes1.filter(route => {
+  const stops = [
+    route.originating_point.toLowerCase().trim(),
+    ...route.stoppages.map(s => s.toLowerCase().trim()),
+    route.terminating_point.toLowerCase().trim()
+  ];
+
+  const fromIndex = stops.indexOf(from);
+  const toIndex = stops.indexOf(to);
+
+  const reverseFromIndex = stops.indexOf(to);
+  const reverseToIndex = stops.indexOf(from);
+
+  return (
+    (fromIndex !== -1 && toIndex !== -1 && fromIndex < toIndex) ||  // normal direction
+    (reverseFromIndex !== -1 && reverseToIndex !== -1 && reverseFromIndex < reverseToIndex)  // reverse direction
+  );
+});
+
+  if (matchedRoutes1.length === 0) {
+    resultBox1.innerHTML = `
+      <div style="background:#f9f9f9; padding:20px; border-radius:12px; margin-top:15px; box-shadow:0 2px 8px rgba(0,0,0,0.1); font-family:sans-serif;">
+        <p style="color:red;">No routes found between "${from}" and "${to}".</p>
+      </div>`;
+  } else {
+    let resultHTML = `
+      <div style="
+        background:#f9f9f9;
+        padding:20px;
+        border-radius:12px;
+        margin-top:15px;
+        box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        font-family:sans-serif;
+        max-height:400px;
+        overflow-y:auto;
+      ">
+        <p style="font-weight:bold; color:green; font-size:16px;">
+          Found ${matchedRoutes1.length} route(s) between <strong>${from}</strong> and <strong>${to}</strong>:
+        </p>`;
+
+    matchedRoutes1.forEach((route, index) => {
+  const mapBtnId1 = `map-${index}`;
+  const stopBoxId1 = `stops-${index}`;
+  const btnId1 = `btn-${index}`;
+
+  resultHTML += `
+    <div style="
+      margin-top:15px;
+      padding:15px;
+      background:#fff;
+      border-radius:10px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.1);
+      font-family:sans-serif;
+    ">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <strong style="font-size:16px;">Route ${route.route_number}</strong>
+        <button id="${btnId1}" style="
+          padding:5px 10px;
+          background:#007BFF;
+          color:#fff;
+          border:none;
+          border-radius:5px;
+          font-size:12px;
+          cursor:pointer;
+        ">Show Stops</button>
+      </div>
+
+      <p style="margin:8px 0 10px 0; font-size:14px;">
+        ${route.originating_point} → ${route.terminating_point}
+      </p>
+
+      <div id="${stopBoxId1}" style="
+        display:none;
+        background:#f1f6fa;
+        border:1px solid #ccc;
+        border-radius:5px;
+        padding:10px;
+        font-size:13px;
+        line-height:1.6;
+        overflow-y:auto;
+      ">
+        <strong>Stops:</strong><br>
+        ${route.stoppages.join(' → ')}
+      </div>
+
+      <button id="${mapBtnId1}" style="
+        margin-top: 10px;
+        width: 100%;
+        padding: 10px;
+        background: #274e64;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 14px;
+      ">
+        <span style="font-size: 16px;"><i class="fas fa-map-marked-alt"></i></span> View Route on Map
+      </button>
+    </div>`;
+});
+
+
+    resultHTML += `</div>`;
+    resultBox1.innerHTML = resultHTML;
+
+    // Add Show/Hide Stops functionality
+    matchedRoutes1.forEach((route, index) => {
+      const btn1 = document.getElementById(`btn-${index}`);
+      const stopBox1 = document.getElementById(`stops-${index}`);
+      let shown = false;
+
+      btn1.addEventListener('click', () => {
+        shown = !shown;
+        stopBox1.style.display = shown ? 'block' : 'none';
+        btn1.textContent = shown ? 'Hide Stops' : 'Show Stops';
+      });
+    });
+  }
+});
+
+// Load suggestions into <datalist>
+fetch('data.json')
+  .then(response => response.json())
+  .then(data => {
+    const allStops1 = new Set();
+    const datalist1 = document.getElementById('stopSuggestions1');
+
+    data.forEach(route => {
+      allStops1.add(route.originating_point);
+      allStops1.add(route.terminating_point);
+      route.stoppages.forEach(stop => allStops1.add(stop));
+    });
+
+    allStops1.forEach(stop => {
+      const option = document.createElement('option');
+      option.value = stop;
+      datalist1.appendChild(option);
+    });
+  })
+  .catch(error => {
+    console.error('Error loading suggestions:', error);
+  });
+
+// Load suggestions into <datalist>
+fetch('data.json')
+  .then(response => response.json())
+  .then(data => {
+    const allStops1 = new Set();
+    const datalist1 = document.getElementById('stopSuggestions1');
+
+    data.forEach(route => {
+      allStops1.add(route.originating_point);
+      allStops1.add(route.terminating_point);
+      route.stoppages.forEach(stop => allStops1.add(stop));
+    });
+
+    allStops1.forEach(stop => {
+      const option = document.createElement('option');
+      option.value = stop;
+      datalist1.appendChild(option);
+    });
+  })
+  .catch(error => {
+    console.error('Error loading suggestions:', error);
+  });
