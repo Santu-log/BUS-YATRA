@@ -227,56 +227,56 @@ function displayRouteDetails(route) {
 
 // Source/Destination switching functionality
 document.querySelector('.switch-locations').addEventListener('click', function() {
-    const sourceInput = document.getElementById('sourceInput');
-    const destinationInput = document.getElementById('destinationInput');
+    // const sourceInput = document.getElementById('sourceInput');
+    // const destinationInput = document.getElementById('destinationInput');
     const temp = sourceInput.value;
     sourceInput.value = destinationInput.value;
     destinationInput.value = temp;
 });
 
 // Source/Destination search functionality
-function searchRoutes() {
-    const source = document.getElementById('sourceInput').value.trim().toLowerCase();
-    const destination = document.getElementById('destinationInput').value.trim().toLowerCase();
+// function searchRoutes() {
+//     // const source = document.getElementById('sourceInput').value.trim().toLowerCase();
+//     // const destination = document.getElementById('destinationInput').value.trim().toLowerCase();
     
-    if (!source || !destination) {
-        alert('Please enter both source and destination');
-        return;
-    }
+//     if (!source || !destination) {
+//         alert('Please enter both source and destination');
+//         return;
+//     }
     
-    const matchingRoutes = routeData.filter(route => {
-        const routeStops = route.stoppages.map(stop => stop.toLowerCase());
-        const origin = route.originating_point.toLowerCase();
-        const terminus = route.terminating_point.toLowerCase();
+//     const matchingRoutes = routeData.filter(route => {
+//         const routeStops = route.stoppages.map(stop => stop.toLowerCase());
+//         const origin = route.originating_point.toLowerCase();
+//         const terminus = route.terminating_point.toLowerCase();
         
-        const sourceIsOrigin = origin.includes(source);
-        const sourceIsTerminus = terminus.includes(source);
-        const sourceInStops = routeStops.some(stop => stop.includes(source));
+//         const sourceIsOrigin = origin.includes(source);
+//         const sourceIsTerminus = terminus.includes(source);
+//         const sourceInStops = routeStops.some(stop => stop.includes(source));
         
-        const destIsOrigin = origin.includes(destination);
-        const destIsTerminus = terminus.includes(destination);
-        const destInStops = routeStops.some(stop => stop.includes(destination));
+//         const destIsOrigin = origin.includes(destination);
+//         const destIsTerminus = terminus.includes(destination);
+//         const destInStops = routeStops.some(stop => stop.includes(destination));
         
-        if (!(sourceIsOrigin || sourceIsTerminus || sourceInStops) || 
-            !(destIsOrigin || destIsTerminus || destInStops)) {
-            return false;
-        }
+//         if (!(sourceIsOrigin || sourceIsTerminus || sourceInStops) || 
+//             !(destIsOrigin || destIsTerminus || destInStops)) {
+//             return false;
+//         }
         
-        const sourceIndex = sourceInStops ? routeStops.findIndex(stop => stop.includes(source)) : -1;
-        const destIndex = destInStops ? routeStops.findIndex(stop => stop.includes(destination)) : -1;
+//         const sourceIndex = sourceInStops ? routeStops.findIndex(stop => stop.includes(source)) : -1;
+//         const destIndex = destInStops ? routeStops.findIndex(stop => stop.includes(destination)) : -1;
         
-        return (
-            (sourceIsOrigin && (destIsTerminus || destInStops)) ||
-            (sourceInStops && destIsTerminus) ||
-            (sourceInStops && destInStops && sourceIndex < destIndex) ||
-            (sourceIsTerminus && (destIsOrigin || destInStops)) ||
-            (sourceInStops && destIsOrigin) ||
-            (sourceInStops && destInStops && sourceIndex > destIndex)
-        );
-    });
+//         return (
+//             (sourceIsOrigin && (destIsTerminus || destInStops)) ||
+//             (sourceInStops && destIsTerminus) ||
+//             (sourceInStops && destInStops && sourceIndex < destIndex) ||
+//             (sourceIsTerminus && (destIsOrigin || destInStops)) ||
+//             (sourceInStops && destIsOrigin) ||
+//             (sourceInStops && destInStops && sourceIndex > destIndex)
+//         );
+//     });
     
-    displayResults(matchingRoutes, source, destination);
-}
+    // displayResults(matchingRoutes, source, destination);
+// }
 
 function displayResults(routes, source, destination) {
     const resultsContainer = document.createElement('div');
@@ -609,4 +609,3 @@ fetch('data.json')
         alert("Geolocation is not supported by this browser.");
       }
     }
-    

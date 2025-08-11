@@ -187,7 +187,7 @@
             <div class="dashboard-card" id="s&d">
                 <div class="input-container">
                     <i class="fa-solid fa-location-dot input-icon"></i>
-                    <input type="text" placeholder="From Location" class="input-field" id="sourceInput">
+                    <input type="text" placeholder="From Location" class="input-field"  list="stopSuggestions1" id="sourceInput">
                     <i class="fa-solid fa-microphone input-icon right-icon"></i>
                 </div>
                 
@@ -198,11 +198,13 @@
                 
                 <div class="input-container">
                     <i class="fa-solid fa-location-dot input-icon"></i>
-                    <input type="text" placeholder="To Location" class="input-field" id="destinationInput">
+                    <input type="text" placeholder="To Location" class="input-field"  list="stopSuggestions1" id="destinationInput">
                     <i class="fa-solid fa-microphone input-icon right-icon"></i>
                 </div>
                 
-                <button class="primary-button" onclick="searchRoutes()">Find Bus</button>
+                <button class="primary-button" id="searchbtn1">Find Bus</button>
+                <datalist id="stopSuggestions1"></datalist>
+                <div id="resultBox1"></div>
             </div>
             
             <!-- Second Container -->
