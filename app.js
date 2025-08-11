@@ -609,3 +609,4 @@ fetch('data.json')
         alert("Geolocation is not supported by this browser.");
       }
     }
+    
