@@ -416,17 +416,95 @@ const input3 = document.getElementById('loc3');
 const button = document.getElementById('searchButton3');
 const resultBox = document.getElementById('resultBox');
 
-let busRoutes = [];
+// Create suggestion box div
+const suggestionBox = document.createElement('div');
+suggestionBox.id = 'suggestionBox';
+suggestionBox.style.cssText = `
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  display: none;
+  font-family: sans-serif;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+`;
+button.insertAdjacentElement('afterend', suggestionBox);
 
+let busRoutes = [];
+let allStopsList = [];
+
+// Load routes and stops
 fetch('data.json')
   .then(res => res.json())
   .then(data => {
     busRoutes = data;
+
+    const allStops = new Set();
+    data.forEach(route => {
+      allStops.add(route.originating_point);
+      allStops.add(route.terminating_point);
+      route.stoppages.forEach(stop => allStops.add(stop));
+    });
+
+    allStopsList = Array.from(allStops);
   })
   .catch(err => {
     resultBox.innerHTML = `<p style="color:red;">Error loading route data.</p>`;
   });
 
+// Handle input typing
+input3.addEventListener('input', () => {
+  const query = input3.value.trim().toLowerCase();
+  suggestionBox.innerHTML = '';
+
+  if (!query) {
+    suggestionBox.style.display = 'none';
+    return;
+  }
+
+  const matches = allStopsList.filter(stop =>
+    stop.toLowerCase().includes(query)
+  );
+
+  if (matches.length === 0) {
+    suggestionBox.style.display = 'none';
+    return;
+  }
+
+  matches.forEach(stop => {
+    const item = document.createElement('div');
+    item.textContent = stop;
+    item.style.cssText = `
+      padding: 8px 12px;
+      cursor: pointer;
+    `;
+    item.addEventListener('mouseenter', () => {
+      item.style.background = '#f1f1f1';
+    });
+    item.addEventListener('mouseleave', () => {
+      item.style.background = 'transparent';
+    });
+    item.addEventListener('click', () => {
+      input3.value = stop;
+      suggestionBox.style.display = 'none';
+    });
+
+    suggestionBox.appendChild(item);
+  });
+
+  suggestionBox.style.display = 'block';
+});
+
+// Hide suggestions if clicking elsewhere
+document.addEventListener('click', (e) => {
+  if (!suggestionBox.contains(e.target) && e.target !== input3) {
+    suggestionBox.style.display = 'none';
+  }
+});
+
+// Search button click event (same logic as before)
 button.addEventListener('click', () => {
   const location = input3.value.trim().toLowerCase();
   resultBox.innerHTML = '';
@@ -470,76 +548,71 @@ button.addEventListener('click', () => {
         </p>`;
 
     matchedRoutes.forEach((route, index) => {
-const stopList = `<strong>Stops:</strong><br>${route.stoppages.join(' → ')}`;
+      const stopBoxId = `stops-${index}`;
+      const btnId = `btn-${index}`;
+      const mapBtnId = `map-${index}`;
 
-  const mapBtnId = `map-${index}`;
+      resultHTML += `
+        <div style="
+          margin-top:15px;
+          padding:15px;
+          background:#fff;
+          border-radius:10px;
+          box-shadow:0 1px 4px rgba(0,0,0,0.1);
+          font-family:sans-serif;
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>Route ${route.route_number}</strong>
+            <button id="${btnId}" style="
+              padding:5px 10px;
+              background:#007BFF;
+              color:#fff;
+              border:none;
+              border-radius:5px;
+              font-size:12px;
+              cursor:pointer;
+            ">Show Stops</button>
+          </div>
 
- const stopBoxId = `stops-${index}`;
-const btnId = `btn-${index}`;
+          <p style="margin:5px 0 10px 0; font-size:14px;">
+            ${route.originating_point} → ${route.terminating_point}
+          </p>
 
-resultHTML += `
-  <div style="
-    margin-top:15px;
-    padding:15px;
-    background:#fff;
-    border-radius:10px;
-    box-shadow:0 1px 4px rgba(0,0,0,0.1);
-    font-family:sans-serif;
-  ">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <strong>Route ${route.route_number}</strong>
-      <button id="${btnId}" style="
-        padding:5px 10px;
-        background:#007BFF;
-        color:#fff;
-        border:none;
-        border-radius:5px;
-        font-size:12px;
-        cursor:pointer;
-      ">Show Stops</button>
-    </div>
-    
-    <p style="margin:5px 0 10px 0; font-size:14px;">
-      ${route.originating_point} → ${route.terminating_point}
-    </p>
+          <div id="${stopBoxId}" style="
+            display:none;
+            background:#f1f6fa;
+            border:1px solid #ccc;
+            border-radius:5px;
+            padding:10px;
+            font-size:13px;
+            line-height:1.6;
+            overflow-y:auto;
+          ">
+            <strong>Stops:</strong><br>
+            ${route.stoppages.join(' → ')}
+          </div>
 
-    <div id="${stopBoxId}" style="
-      display:none;
-      background:#f1f6fa;
-      border:1px solid #ccc;
-      border-radius:5px;
-      padding:10px;
-      font-size:13px;
-      line-height:1.6;
-      overflow-y:auto;
-    ">
-      <strong>Stops:</strong><br>
-      ${route.stoppages.join(' → ')}
-    </div>
-<button id="${mapBtnId}" style="
-  margin-top: 10px;
-  width: 100%;
-  padding: 10px;
-  background: #274e64;
-  color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 14px;
-">
-  <span style="font-size: 16px;"><i class="fas fa-map-marked-alt"></i></span> View Route on Map
-</button>
-
-  </div>
-`;
-
-});
-
+          <button id="${mapBtnId}" style="
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            background: #274e64;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 14px;
+          ">
+            <span style="font-size: 16px;"><i class="fas fa-map-marked-alt"></i></span> View Route on Map
+          </button>
+        </div>
+      `;
+    });
 
     resultHTML += `</div>`;
     resultBox.innerHTML = resultHTML;
@@ -554,37 +627,16 @@ resultHTML += `
         stopBox.style.display = shown ? 'block' : 'none';
         btn.textContent = shown ? 'Hide Stops' : 'Show Stops';
       });
+
+      document.getElementById(`map-${index}`).addEventListener('click', () => {
+        const origin = encodeURIComponent(route.originating_point);
+        const destination = encodeURIComponent(route.terminating_point);
+        window.open(`https://www.google.com/maps/dir/${origin}/${destination}`, '_blank');
+      });
     });
   }
 });
 
-
-// suggestionsDropdown
-fetch('data.json')
-  .then(response => response.json())
-  .then(data => {
-    const allStops = new Set();
-    const datalist = document.getElementById('stopSuggestions');
-
-    data.forEach(route => {
-      // Add originating point and terminating point
-      allStops.add(route.originating_point);
-      allStops.add(route.terminating_point);
-
-      // Add all stoppages
-      route.stoppages.forEach(stop => allStops.add(stop));
-    });
-
-    // Add all unique stops to the datalist
-    allStops.forEach(stop => {
-      const option = document.createElement('option');
-      option.value = stop;
-      datalist.appendChild(option);
-    });
-  })
-  .catch(error => {
-    console.error('Error loading suggestions:', error);
-  });
 
 
 //   view  on map button
@@ -609,26 +661,88 @@ fetch('data.json')
         alert("Geolocation is not supported by this browser.");
       }
     }
+    
 
 
 
-// / From destination to To destination search functionality
 const fromInput = document.getElementById('sourceInput');
 const toInput = document.getElementById('destinationInput');
 const button1 = document.getElementById('searchbtn1');
 const resultBox1 = document.getElementById('resultBox1');
+const suggestionBox1 = document.getElementById('suggestionBox'); // New div for suggestions
 
 let busRoutes1 = [];
+let allStops1 = [];
 
+// Fetch data.json
 fetch('data.json')
   .then(res => res.json())
   .then(data => {
     busRoutes1 = data;
+
+    // Collect all stops
+    const stopsSet = new Set();
+    data.forEach(route => {
+      stopsSet.add(route.originating_point);
+      stopsSet.add(route.terminating_point);
+      route.stoppages.forEach(stop => stopsSet.add(stop));
+    });
+    allStops1 = Array.from(stopsSet);
   })
   .catch(err => {
     resultBox1.innerHTML = `<p style="color:red;">Error loading route data.</p>`;
   });
 
+// Function to show suggestions
+function showSuggestions1(inputElement) {
+  const query = inputElement.value.trim().toLowerCase();
+  suggestionBox1.innerHTML = ''; // Clear previous suggestions
+
+  if (!query) {
+    suggestionBox1.style.display = 'none';
+    return;
+  }
+
+  const matches = allStops1.filter(stop =>
+    stop.toLowerCase().includes(query)
+  );
+
+  if (matches.length === 0) {
+    suggestionBox1.style.display = 'none';
+    return;
+  }
+
+  matches.forEach(stop => {
+    const div = document.createElement('div');
+    div.textContent = stop;
+    div.style.padding = '8px';
+    div.style.cursor = 'pointer';
+    div.style.borderBottom = '1px solid #ddd';
+    div.addEventListener('click', () => {
+      inputElement.value = stop;
+      suggestionBox1.style.display = 'none';
+    });
+    suggestionBox1.appendChild(div);
+  });
+
+  suggestionBox1.style.display = 'block';
+}
+
+// Attach events to inputs
+[fromInput, toInput].forEach(input => {
+  input.addEventListener('input', () => showSuggestions1(input));
+});
+
+// Hide suggestions when clicking outside
+document.addEventListener('click', (e) => {
+  if (!suggestionBox1.contains(e.target) &&
+      e.target !== fromInput &&
+      e.target !== toInput) {
+    suggestionBox1.style.display = 'none';
+  }
+});
+
+// --- Existing search button click code stays the same ---
 button1.addEventListener('click', () => {
   const from = fromInput.value.trim().toLowerCase();
   const to = toInput.value.trim().toLowerCase();
@@ -761,8 +875,8 @@ button1.addEventListener('click', () => {
     resultHTML += `</div>`;
     resultBox1.innerHTML = resultHTML;
 
-    // Add Show/Hide Stops functionality
-    matchedRoutes1.forEach((match, index) => {
+    // Show/hide stops
+    matchedRoutes1.forEach((route, index) => {
       const btn = document.getElementById(`btn-${index}`);
       const stopBox = document.getElementById(`stops-${index}`);
       let shown = false;
@@ -772,31 +886,13 @@ button1.addEventListener('click', () => {
         stopBox.style.display = shown ? 'block' : 'none';
         btn.textContent = shown ? 'Hide Stops' : 'Show Stops';
       });
+      document.getElementById(`map-${index}`).addEventListener('click', () => {
+  const stopsForMap = route.stops.map(stop => encodeURIComponent(stop));
+  const mapsURL = `https://www.google.com/maps/dir/${stopsForMap.join('/')}`;
+  window.open(mapsURL, '_blank');
+});
+
+
     });
   }
 });
-
-// Load suggestions into <datalist>
-fetch('data.json')
-  .then(response => response.json())
-  .then(data => {
-    const allStops1 = new Set();
-    const datalist1 = document.getElementById('stopSuggestions1');
-
-    data.forEach(route => {
-      allStops1.add(route.originating_point);
-      allStops1.add(route.terminating_point);
-      route.stoppages.forEach(stop => allStops1.add(stop));
-    });
-
-    allStops1.forEach(stop => {
-      const option = document.createElement('option');
-      option.value = stop;
-      datalist1.appendChild(option);
-    });
-  })
-  .catch(error => {
-    console.error('Error loading suggestions:', error);
-  });
-
-

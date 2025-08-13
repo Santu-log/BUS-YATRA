@@ -203,7 +203,18 @@
                 </div>
                 
                 <button class="primary-button" id="searchbtn1">Find Bus</button>
-                <datalist id="stopSuggestions1"></datalist>
+                <div id="suggestionBox" style="
+                    display:none;
+                    background:#fff;
+                    border:1px solid #ccc;
+                    border-radius:5px;
+                    margin-top:5px;
+                    max-height:200px;
+                    overflow-y:auto;
+                    font-family:sans-serif;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+                    ">
+                </div>
                 <div id="resultBox1"></div>
             </div>
             
@@ -229,6 +240,7 @@
                 </div>
                 
                 <button id="searchButton3" class="primary-button">Search Bus Route</button>
+                <div id="suggestions" class="suggestion-box"></div>
                 <div id="resultBox"></div>
             </div>
         </div>
