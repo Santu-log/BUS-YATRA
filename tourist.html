@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="wbtc.css"> 
-    <link rel="icon" href="Bus logo.webp">
+     <link rel="stylesheet" href="style.css"> 
+    <link rel="icon" href="new_logo.jpg">
     <title>BUS-YATRA</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -22,8 +23,8 @@
                  
                 <h1 class="text-xl font-bold text-blue-800" >TOURIST</h1>
                  <button type="button" class="btn btn-outline-primary" ><a href="index.html" style="text-decoration: none;">home</a></button>
-   
- <button type="button" class="btn btn-outline-primary" ><a href="wbtc.html" style="text-decoration: none;">Fetch Current Location</a></button>
+<!--    
+ <button type="button" class="btn btn-outline-primary" ><a href="wbtc.html" style="text-decoration: none;">Fetch Current Location</a></button> -->
     
             </div>
       
@@ -69,55 +70,76 @@
     <main class="container mx-auto px-4 py-8" >
         <div class="dashboard-container">
     
-            <div class="card">
+           <div class="card" id="sbstc">
             <div class="card-header crop-header">
-                <h3>TOURIST BUS </h3>
+                <h3>TOURIST </h3>
                 <i class="fa-solid fa-bus"></i>
             </div>
             <div class="image no5">
-                <!-- <img src="75 bus image.jpeg" alt=""> -->
-            </div>
-            <div class="card-body">
-               
-                <div class="location-text">Select your location</div>
-                </br>
-                <div class="location">
-                <input placeholder="Select Your location" type="text" class="locationInput">
-                <select class="selectLocation">
-                    <option>Victoria Memorial</option>
-                    <option>Howrah Bridge</option>
-                    <option>Park Street</option>
-                </select>
-                </div>
-                <div class="location-text">Select your location</div>
-                <div class="location">
-                <input placeholder="Select Your location" type="text" class="locationInput">
-                <select class="selectLocation">
-                    <option>Indian Museum</option>
-                    <option>Scince City</option>
-                    <option>Prinsep Ghat</option>
-                    <option>Eco Park</option>
-                </select>
                 
             </div>
+                  <div class="card-body">
+               
+                <div class="dashboard-card" id="s&d">
+                <div class="input-container">
+                    <i class="fa-solid fa-location-dot input-icon"></i>
+                    <input type="text" placeholder="From Location" class="input-field" id="sourceInput">
+                    <i class="fa-solid fa-microphone input-icon right-icon"></i>
+                </div>
+                
+                <div class="switch-container">
+                    <div class="switch-locations">⇅</div>
+                    <!-- <div class="add-stop">Add Stop</div> -->
+                </div>
+                
+                <div class="input-container">
+                    <i class="fa-solid fa-location-dot input-icon"></i>
+                    <input type="text" placeholder="To Location" class="input-field" id="destinationInput">
+                    <i class="fa-solid fa-microphone input-icon right-icon"></i>
+                </div>
+                
+                <button class="primary-button" onclick="searchRoutes()">Find Bus</button>
+            </div>
+           
 
-
-                <div class="location-text">Bus Type</div>
+                <!-- <div class="location-text">Bus Type</div>
                 <div class="location">
- <input placeholder="Select Your location" type="text">
-                <select >
+                <input placeholder="Select Your location" type="text" class="locationInput">
+                <select class="selectLocation">
                       
                     <option>Ac Bus</option>
                     <option>Non Ac Bus </option>
                 </select>
             </div>
 
-                <button class="recommend-btn" style="margin-top: 10px;">Find Bus</button>
-                <button class="recommend-btn" style="margin-top: 10px;">Ticket Price</button>
+                <button class="recommend-btn">Find Bus</button> -->
+                <!-- <button class="recommend-btn" style="margin-top: 10px;">Ticket Price</button> -->
+
+                     <div class="dashboard-card Second-Container" id="usingname" style="margin-top: 1rem;">
+    <div class="input-with-button">
+        <input type="text" id="routeSelect" placeholder="Enter Bus Name" class="input-field">
+        <button id="fetchBtn" class="primary-button" style="margin-top: 0px;">
+            <i class="fa-brands fa-searchengin"></i>
+        </button>
+    </div>
+    
+    <div id="routeDetails" class="route-details"></div>
+</div>
+
+   <!-- Third Container -->
+            <div class="dashboard-card Second-Container" id="usinglocation" style="margin-top: 1rem; ; ">
+                <div class="input-container " style="position:static;">
+                    <!-- <i class="fa-solid fa-location-dot input-icon"></i> -->
+                    <input type="text" placeholder="Location" list="stopSuggestions" id="loc3" class="input-field"  >
+                    <datalist id="stopSuggestions"></datalist>
+                    <!-- <i class="fa-solid fa-microphone input-icon right-icon"></i> -->
+                </div>
+                
+                <button id="searchButton3" class="primary-button">Search Bus Route</button>
+                <div id="resultBox"></div>
             </div>
+</div>
         </div>
-
-
 
 
     </div>
