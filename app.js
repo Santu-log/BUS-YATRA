@@ -1,3 +1,53 @@
+// app.js
+
+let currentUser = null; // Global variable to store the logged-in user info
+
+// --- Firebase Authentication State Listener ---
+auth.onAuthStateChanged(user => {
+    const authButton = document.getElementById('auth-button');
+    const userDisplayName = document.getElementById('user-display-name');
+    const favoritesSection = document.getElementById('favorites-section');
+
+    if (user) {
+        // User is signed in!
+        currentUser = user;
+        console.log('Logged in as:', user.displayName || user.email);
+
+        // Display user's name (use email if name is not available)
+        userDisplayName.textContent = `Welcome, ${user.displayName || user.email.split('@')[0]}`;
+        
+        // Change the button to a "Sign Out" button
+        authButton.textContent = 'Sign Out';
+        authButton.href = '#'; 
+        authButton.onclick = (e) => {
+            e.preventDefault();
+            auth.signOut();
+        };
+        
+        // Show favorites section and load data
+        favoritesSection.style.display = 'block';
+        loadUserFavorites(user.uid);
+
+    } else {
+        // User is signed out
+        currentUser = null;
+        console.log('No user is logged in.');
+        
+        // Clear user's name
+        userDisplayName.textContent = '';
+
+        // Change the button back to "Sign In"
+        authButton.textContent = 'Sign In';
+        authButton.href = 'sing_in.html';
+        authButton.onclick = null; 
+        
+        // Hide favorites section
+        favoritesSection.style.display = 'none';
+    }
+});
+
+// ... rest of your existing app.js code ...
+
 const allSelects = document.querySelectorAll(".selectLocation");
 
 allSelects.forEach(select => {
@@ -895,4 +945,61 @@ button1.addEventListener('click', () => {
 
     });
   }
+});
+
+// --- ADD THIS FUNCTION to the end of app.js ---
+
+function loadUserFavorites(userId) {
+    const favoritesList = document.getElementById('favorites-list');
+    
+    // Use onSnapshot for real-time updates
+    db.collection('users').doc(userId).collection('favorites')
+      .orderBy('savedAt', 'desc') // Show newest first
+      .onSnapshot(snapshot => {
+        if (snapshot.empty) {
+            favoritesList.innerHTML = '<p class="text-gray-500">You have no saved favorite routes yet.</p>';
+            return;
+        }
+
+        let html = '<div class="list-group">';
+        snapshot.forEach(doc => {
+            const route = doc.data();
+            html += `
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Route ${route.routeNumber}</h5>
+                        <p class="mb-1 text-muted">${route.origin} → ${route.destination}</p>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-favorite-btn" data-id="${doc.id}">
+                       <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `;
+        });
+        html += '</div>';
+
+        favoritesList.innerHTML = html;
+    }, error => {
+        console.error("Error fetching favorites: ", error);
+        favoritesList.innerHTML = '<p class="text-danger">Could not load your favorites.</p>';
+    });
+}
+
+// --- ADD an event listener for deleting favorites ---
+document.getElementById('favorites-list').addEventListener('click', (e) => {
+    const deleteButton = e.target.closest('.delete-favorite-btn');
+    if (deleteButton) {
+        if (!currentUser) return; // Safety check
+
+        const docId = deleteButton.dataset.id;
+        if (confirm('Are you sure you want to remove this favorite?')) {
+            db.collection('users').doc(currentUser.uid).collection('favorites').doc(docId).delete()
+                .then(() => {
+                    console.log('Favorite successfully deleted!');
+                }).catch((error) => {
+                    console.error('Error removing favorite: ', error);
+                    alert('Could not remove favorite.');
+                });
+        }
+    }
 });
